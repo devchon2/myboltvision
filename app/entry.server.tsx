@@ -1,80 +1,51 @@
-import type { AppLoadContext } from '@remix-run/cloudflare';
-import { RemixServer } from '@remix-run/react';
-import { isbot } from 'isbot';
-import { renderToReadableStream } from 'react-dom/server';
-import { renderHeadToString } from 'remix-island';
-import { Head } from './root';
-import { themeStore } from '~/lib/stores/theme';
+/**
+ * Fichier entry.server.tsx simplifié
+ * Configuration Remix standard sans dépendances spécifiques
+ */
+import type { EntryContext } from "@remix-run/cloudflare";
+import { RemixServer } from "@remix-run/react";
+import { renderToString } from "react-dom/server";
 
-export default async function handleRequest(
+/**
+ * Fonction de rendu côté serveur standard pour Remix
+ * Version ultra simplifiée sans manipulation des loaders
+ */
+export default function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
-  remixContext: any,
-  _loadContext: AppLoadContext,
+  remixContext: EntryContext
 ) {
-  // await initializeModelList({});
+  // Utilisation de la fonction standard de Remix sans manipulations supplémentaires
+  try {
+    const markup = renderToString(
+      <RemixServer context={remixContext} url={request.url} />
+    );
 
-  const readable = await renderToReadableStream(<RemixServer context={remixContext} url={request.url} />, {
-    signal: request.signal,
-    onError(error: unknown) {
-      console.error(error);
-      responseStatusCode = 500;
-    },
-  });
+    responseHeaders.set("Content-Type", "text/html");
 
-  const body = new ReadableStream({
-    start(controller) {
-      const head = renderHeadToString({ request, remixContext, Head });
-
-      controller.enqueue(
-        new Uint8Array(
-          new TextEncoder().encode(
-            `<!DOCTYPE html><html lang="en" data-theme="${themeStore.value}"><head>${head}</head><body><div id="root" class="w-full h-full">`,
-          ),
-        ),
-      );
-
-      const reader = readable.getReader();
-
-      function read() {
-        reader
-          .read()
-          .then(({ done, value }) => {
-            if (done) {
-              controller.enqueue(new Uint8Array(new TextEncoder().encode('</div></body></html>')));
-              controller.close();
-
-              return;
-            }
-
-            controller.enqueue(value);
-            read();
-          })
-          .catch((error) => {
-            controller.error(error);
-            readable.cancel();
-          });
-      }
-      read();
-    },
-
-    cancel() {
-      readable.cancel();
-    },
-  });
-
-  if (isbot(request.headers.get('user-agent') || '')) {
-    await readable.allReady;
+    return new Response(`<!DOCTYPE html>${markup}`, {
+      headers: responseHeaders,
+      status: responseStatusCode,
+    });
+  } catch (error) {
+    console.error("[Entry Server] Erreur de rendu:", error);
+    
+    // Retourner une page minimale en cas d'erreur
+    return new Response(`<!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>MyBoltVision</title>
+        </head>
+        <body>
+          <h1>Erreur de rendu</h1>
+          <p>Une erreur s'est produite lors du rendu de l'application.</p>
+          <script>window.location.reload();</script>
+        </body>
+      </html>`, {
+      headers: new Headers({ "Content-Type": "text/html" }),
+      status: 500,
+    });
   }
-
-  responseHeaders.set('Content-Type', 'text/html');
-
-  responseHeaders.set('Cross-Origin-Embedder-Policy', 'require-corp');
-  responseHeaders.set('Cross-Origin-Opener-Policy', 'same-origin');
-
-  return new Response(body, {
-    headers: responseHeaders,
-    status: responseStatusCode,
-  });
 }

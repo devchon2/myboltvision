@@ -1,0 +1,40 @@
+{
+  "routes": [
+    {
+      "id": "root",
+      "path": "/",
+      "file": "app/root.tsx",
+      "hasLoader": true,
+      "hasAction": false
+    },
+    {
+      "id": "routes/_index",
+      "path": "/",
+      "file": "app/routes/_index.tsx",
+      "hasLoader": true,
+      "hasAction": false,
+      "parentId": "root"
+    },
+    {
+      "id": "routes/api.chat",
+      "path": "/api/chat",
+      "file": "app/routes/api.chat.ts", 
+      "hasLoader": true,
+      "hasAction": true
+    },
+    {
+      "id": "routes/api.enhancer",
+      "path": "/api/enhancer",
+      "file": "app/routes/api.enhancer.ts", 
+      "hasLoader": true,
+      "hasAction": true
+    },
+    {
+      "id": "routes/api.llmcall",
+      "path": "/api/llmcall",
+      "file": "app/routes/api.llmcall.ts", 
+      "hasLoader": true,
+      "hasAction": true
+    }
+  ]
+}

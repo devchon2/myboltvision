@@ -1,8 +1,14 @@
-import { type ActionFunctionArgs } from '@remix-run/cloudflare';
+import { type ActionFunctionArgs, json, type LoaderFunctionArgs } from '@remix-run/cloudflare';
 import { streamText } from '~/lib/.server/llm/stream-text';
 import { stripIndents } from '~/utils/stripIndent';
 import type { ProviderInfo } from '~/types/model';
 import { getApiKeysFromCookie, getProviderSettingsFromCookie } from '~/lib/api/cookies';
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  // Répondre aux requêtes GET avec un statut 405 Method Not Allowed
+  // Cette route est destinée uniquement aux requêtes POST
+  return json({ error: "Method not allowed. Use POST instead." }, { status: 405 });
+}
 
 export async function action(args: ActionFunctionArgs) {
   return enhancerAction(args);

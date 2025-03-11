@@ -1,9 +1,11 @@
 export type DebugLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error';
-import { Chalk } from 'chalk';
-
-const chalk = new Chalk({ level: 3 });
+import chalk from 'chalk';
+import fs from 'fs';
+import path from 'path';
 
 type LoggerFunction = (...messages: any[]) => void;
+
+const chalkInstance = chalk;
 
 interface Logger {
   trace: LoggerFunction;
@@ -14,7 +16,18 @@ interface Logger {
   setLevel: (level: DebugLevel) => void;
 }
 
-let currentLevel: DebugLevel = (import.meta.env.VITE_LOG_LEVEL ?? import.meta.env.DEV) ? 'debug' : 'info';
+let currentLevel: DebugLevel = (process.env.VITE_LOG_LEVEL ?? (process.env.NODE_ENV !== 'production')) ? 'debug' : 'info';
+
+// Configuration du logger pour écrire dans des fichiers
+const logDirectory = path.join(__dirname, '..', '..', 'docs', 'logs');
+if (!fs.existsSync(logDirectory)) {
+  fs.mkdirSync(logDirectory, { recursive: true });
+}
+
+const logToFile = (filename: string, message: string) => {
+  const logFilePath = path.join(logDirectory, filename);
+  fs.appendFileSync(logFilePath, `${new Date().toISOString()} - ${message}\n`);
+};
 
 export const logger: Logger = {
   trace: (...messages: any[]) => log('trace', undefined, messages),
@@ -37,7 +50,7 @@ export function createScopedLogger(scope: string): Logger {
 }
 
 function setLevel(level: DebugLevel) {
-  if ((level === 'trace' || level === 'debug') && import.meta.env.PROD) {
+  if ((level === 'trace' || level === 'debug') && process.env.NODE_ENV === 'production') {
     return;
   }
 
@@ -85,6 +98,24 @@ function log(level: DebugLevel, scope: string | undefined, messages: any[]) {
     console.log(`%c${level.toUpperCase()}${scope ? `%c %c${scope}` : ''}`, ...styles, allMessages);
   } else {
     console.log(`${labelText}`, allMessages);
+  }
+
+  // Écriture dans les fichiers de log
+  const logMessage = `${level.toUpperCase()} - ${scope ? `[${scope}] ` : ''}${allMessages}`;
+  switch (level) {
+    case 'trace':
+    case 'debug':
+      logToFile('vite_errors.log', logMessage);
+      break;
+    case 'info':
+      logToFile('runtime_errors.log', logMessage);
+      break;
+    case 'warn':
+      logToFile('runtime_errors.log', logMessage);
+      break;
+    case 'error':
+      logToFile('runtime_errors.log', logMessage);
+      break;
   }
 }
 

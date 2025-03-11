@@ -1,4 +1,4 @@
-import { type ActionFunctionArgs } from '@remix-run/cloudflare';
+import { type ActionFunctionArgs, json, type LoaderFunctionArgs } from '@remix-run/cloudflare';
 import { createDataStream, generateId } from 'ai';
 import { MAX_RESPONSE_SEGMENTS, MAX_TOKENS, type FileMap } from '~/lib/.server/llm/constants';
 import { CONTINUE_PROMPT } from '~/lib/common/prompts/prompts';
@@ -11,6 +11,12 @@ import type { ContextAnnotation, ProgressAnnotation } from '~/types/context';
 import { WORK_DIR } from '~/utils/constants';
 import { createSummary } from '~/lib/.server/llm/create-summary';
 import { extractPropertiesFromMessage } from '~/lib/.server/llm/utils';
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  // Répondre aux requêtes GET avec un statut 405 Method Not Allowed
+  // Cette route est destinée uniquement aux requêtes POST
+  return json({ error: "Method not allowed. Use POST instead." }, { status: 405 });
+}
 
 export async function action(args: ActionFunctionArgs) {
   return chatAction(args);

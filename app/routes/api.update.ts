@@ -1,7 +1,11 @@
-import { json } from '@remix-run/node';
-import type { ActionFunction } from '@remix-run/node';
+import { json } from '@remix-run/cloudflare';
+import type { ActionFunction, LoaderFunctionArgs } from '@remix-run/cloudflare';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  return json({});
+}
 
 const execAsync = promisify(exec);
 

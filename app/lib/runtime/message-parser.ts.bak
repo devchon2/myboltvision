@@ -1,0 +1,265 @@
+// Types pour les callbacks et les données
+export interface ArtifactData {
+  id: string;
+  title: string;
+  type: string;
+}
+
+export type ActionType = 'shell' | 'file' | string;
+
+export interface BaseAction {
+  id: string;
+  type: ActionType;
+  content: string;
+}
+
+export interface ShellAction extends BaseAction {
+  type: 'shell';
+  command: string;
+}
+
+export interface FileAction extends BaseAction {
+  type: 'file';
+  filePath: string;
+}
+
+export type BoltActionData = ShellAction | FileAction | BaseAction;
+export type BoltArtifactData = ArtifactData;
+
+export type ArtifactCallback = (data: BoltArtifactData) => void;
+export type ActionCallback = (data: BoltActionData) => void;
+
+export interface StreamingMessageParserOptions {
+  artifactElement?: (data: BoltArtifactData) => string;
+  callbacks?: {
+    onArtifactOpen?: ArtifactCallback;
+    onArtifactClose?: ArtifactCallback;
+    onActionOpen?: ActionCallback;
+    onActionClose?: ActionCallback;
+  };
+}
+
+export class StreamingMessageParser {
+  private options: StreamingMessageParserOptions;
+  private artifactStack: Map<string, BoltArtifactData> = new Map();
+  private actionStack: Map<string, BoltActionData> = new Map();
+  private buffer: string = '';
+  private inArtifact: boolean = false;
+  private currentArtifactStart: number = -1;
+  private currentArtifactData: BoltArtifactData | null = null;
+  
+  constructor(options: StreamingMessageParserOptions = {}) {
+    this.options = {
+      artifactElement: options.artifactElement || (() => ''),
+      callbacks: options.callbacks || {},
+    };
+  }
+  
+  // Méthode principale pour traiter les chunks de texte
+  parse(messageId: string, content: string): string {
+    // Pour le texte normal, simplement le retourner tel quel
+    if (!content.includes('<boltArtifact')) {
+      return content;
+    }
+    
+    // Ajouter le contenu au buffer
+    this.buffer += content;
+    
+    // Traiter le buffer pour extraire les artifacts et actions
+    let result = this.processBuffer(messageId);
+    
+    // Si aucun traitement n'a été effectué, retourner le contenu original
+    if (result === '') {
+      return content;
+    }
+    
+    return result;
+  }
+  
+  private processBuffer(messageId: string): string {
+    let result = '';
+    let currentPos = 0;
+    
+    // Chercher les balises d'artifacts
+    let artifactOpenIndex = this.buffer.indexOf('<boltArtifact', currentPos);
+    
+    // Si pas de balise d'artifact, retourner le buffer tel quel
+    if (artifactOpenIndex === -1) {
+      result = this.buffer;
+      this.buffer = '';
+      return result;
+    }
+    
+    while (artifactOpenIndex !== -1) {
+      // Ajouter le texte avant la balise
+      result += this.buffer.substring(currentPos, artifactOpenIndex);
+      
+      // Trouver la fin de la balise d'ouverture
+      const tagEndIndex = this.buffer.indexOf('>', artifactOpenIndex);
+      if (tagEndIndex === -1) {
+        // Balise non terminée, retourner le contenu tel quel
+        result += this.buffer.substring(artifactOpenIndex);
+        this.buffer = '';
+        return result;
+      }
+      
+      // Extraire les attributs
+      const attributesStr = this.buffer.substring(artifactOpenIndex + '<boltArtifact'.length, tagEndIndex);
+      const attributes = this.parseAttributes(attributesStr);
+      
+      if (!attributes.id || !attributes.title) {
+        // Balise incomplète ou invalide, on la traite comme du texte normal
+        result += this.buffer.substring(artifactOpenIndex, tagEndIndex + 1);
+        currentPos = tagEndIndex + 1;
+      } else {
+        // Chercher la balise de fermeture
+        const artifactCloseIndex = this.buffer.indexOf('</boltArtifact>', tagEndIndex);
+        if (artifactCloseIndex === -1) {
+          // Balise non fermée, retourner le contenu tel quel
+          result += this.buffer.substring(artifactOpenIndex);
+          this.buffer = '';
+          return result;
+        }
+        
+        // Extraire le contenu entre les balises
+        const artifactContent = this.buffer.substring(tagEndIndex + 1, artifactCloseIndex);
+        
+        // Créer l'objet d'artifact
+        const artifactData: BoltArtifactData = {
+          id: attributes.id,
+          title: attributes.title,
+          type: attributes.type || 'generic',
+        };
+        
+        // Appeler le callback d'ouverture
+        if (this.options.callbacks?.onArtifactOpen) {
+          this.options.callbacks.onArtifactOpen(artifactData);
+        }
+        
+        // Analyser les actions à l'intérieur de l'artifact
+        const processedContent = this.parseActions(artifactContent, messageId, artifactData.id);
+        
+        // Appeler le callback de fermeture
+        if (this.options.callbacks?.onArtifactClose) {
+          this.options.callbacks.onArtifactClose(artifactData);
+        }
+        
+        // Ne pas ajouter le contenu de l'artifact au résultat, seulement préserver le texte original
+        
+        // Mettre à jour la position courante
+        currentPos = artifactCloseIndex + '</boltArtifact>'.length;
+      }
+      
+      // Chercher la prochaine balise
+      artifactOpenIndex = this.buffer.indexOf('<boltArtifact', currentPos);
+    }
+    
+    // Ajouter le reste du buffer après la dernière balise
+    result += this.buffer.substring(currentPos);
+    
+    // Vider le buffer
+    this.buffer = '';
+    
+    return result;
+  }
+
+  private parseAttributes(attributesStr: string): Record<string, string> {
+    const attributes: Record<string, string> = {};
+    const attributePattern = /([a-zA-Z0-9_-]+)="([^"]*)"/g;
+    let match;
+
+    while ((match = attributePattern.exec(attributesStr)) !== null) {
+      attributes[match[1]] = match[2];
+    }
+
+    return attributes;
+  }
+
+  private parseActions(content: string, messageId: string, artifactId: string): string {
+    let currentPos = 0;
+    let result = '';
+
+    // Chercher les balises d'action
+    let actionOpenIndex = content.indexOf('<boltAction', currentPos);
+
+    while (actionOpenIndex !== -1) {
+      // Ajouter le texte avant la balise
+      result += content.substring(currentPos, actionOpenIndex);
+
+      // Trouver la fin de la balise d'ouverture
+      const tagEndIndex = content.indexOf('>', actionOpenIndex);
+      if (tagEndIndex === -1) {
+        // Balise non terminée, on ajoute juste le texte et on sort
+        result += content.substring(actionOpenIndex);
+        break;
+      }
+
+      // Extraire les attributs
+      const attributesStr = content.substring(actionOpenIndex + '<boltAction'.length, tagEndIndex);
+      const attributes = this.parseAttributes(attributesStr);
+
+      // Chercher la balise de fermeture
+      const actionCloseIndex = content.indexOf('</boltAction>', tagEndIndex);
+      if (actionCloseIndex === -1) {
+        // Balise non fermée
+        result += content.substring(actionOpenIndex);
+        break;
+      }
+
+      // Extraire le contenu entre les balises
+      const actionContent = content.substring(tagEndIndex + 1, actionCloseIndex);
+
+      // Créer l'objet d'action
+      const actionType = attributes.type as ActionType || 'generic';
+      const actionId = attributes.id || `action-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+      
+      let actionData: BoltActionData;
+
+      switch (actionType) {
+        case 'shell':
+          actionData = {
+            id: actionId,
+            type: 'shell',
+            command: actionContent,
+            content: actionContent
+          } as ShellAction;
+          break;
+        case 'file':
+          actionData = {
+            id: actionId,
+            type: 'file',
+            filePath: attributes.filePath || '',
+            content: actionContent
+          } as FileAction;
+          break;
+        default:
+          actionData = {
+            id: actionId,
+            type: actionType,
+            content: actionContent
+          } as BaseAction;
+      }
+
+      // Appeler le callback d'ouverture
+      if (this.options.callbacks?.onActionOpen) {
+        this.options.callbacks.onActionOpen(actionData);
+      }
+
+      // Appeler le callback de fermeture
+      if (this.options.callbacks?.onActionClose) {
+        this.options.callbacks.onActionClose(actionData);
+      }
+
+      // Mettre à jour la position courante
+      currentPos = actionCloseIndex + '</boltAction>'.length;
+
+      // Chercher la prochaine balise
+      actionOpenIndex = content.indexOf('<boltAction', currentPos);
+    }
+
+    // Ajouter le reste du contenu
+    result += content.substring(currentPos);
+
+    return result;
+  }
+}

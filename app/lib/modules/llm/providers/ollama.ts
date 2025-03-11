@@ -1,118 +1,144 @@
-import { BaseProvider } from '~/lib/modules/llm/base-provider';
-import type { ModelInfo } from '~/lib/modules/llm/types';
-import type { IProviderSetting } from '~/types/model';
-import type { LanguageModelV1 } from 'ai';
-import { ollama } from 'ollama-ai-provider';
+/**
+ * Provider Ollama AI pour MyBoltVision
+ * 
+ * Ce module permet l'intégration avec Ollama pour l'exécution de modèles LLM localement.
+ */
+
+import type { LLMProvider, ModelInfo, ProviderOptions, ChatMessage, LLMResponse } from '~/types/llm';
 import { logger } from '~/utils/logger';
 
-interface OllamaModelDetails {
-  parent_model: string;
-  format: string;
-  family: string;
-  families: string[];
-  parameter_size: string;
-  quantization_level: string;
-}
+export class OllamaProvider implements LLMProvider {
+  id = 'ollama';
+  name = 'Ollama AI';
+  description = 'Exécution locale de modèles LLM via Ollama';
+  baseUrl: string;
+  apiKey?: string;
+  defaultModel: string;
 
-export interface OllamaModel {
-  name: string;
-  model: string;
-  modified_at: string;
-  size: number;
-  digest: string;
-  details: OllamaModelDetails;
-}
-
-export interface OllamaApiResponse {
-  models: OllamaModel[];
-}
-
-export const DEFAULT_NUM_CTX = process?.env?.DEFAULT_NUM_CTX ? parseInt(process.env.DEFAULT_NUM_CTX, 10) : 32768;
-
-export default class OllamaProvider extends BaseProvider {
-  name = 'Ollama';
-  getApiKeyLink = 'https://ollama.com/download';
-  labelForGetApiKey = 'Download Ollama';
-  icon = 'i-ph:cloud-arrow-down';
-
-  config = {
-    baseUrlKey: 'OLLAMA_API_BASE_URL',
-  };
-
-  staticModels: ModelInfo[] = [];
-
-  async getDynamicModels(
-    apiKeys?: Record<string, string>,
-    settings?: IProviderSetting,
-    serverEnv: Record<string, string> = {},
-  ): Promise<ModelInfo[]> {
-    let { baseUrl } = this.getProviderBaseUrlAndKey({
-      apiKeys,
-      providerSettings: settings,
-      serverEnv,
-      defaultBaseUrlKey: 'OLLAMA_API_BASE_URL',
-      defaultApiTokenKey: '',
-    });
-
-    if (!baseUrl) {
-      throw new Error('No baseUrl found for OLLAMA provider');
-    }
-
-    if (typeof window === 'undefined') {
-      /*
-       * Running in Server
-       * Backend: Check if we're running in Docker
-       */
-      const isDocker = process?.env?.RUNNING_IN_DOCKER === 'true' || serverEnv?.RUNNING_IN_DOCKER === 'true';
-
-      baseUrl = isDocker ? baseUrl.replace('localhost', 'host.docker.internal') : baseUrl;
-      baseUrl = isDocker ? baseUrl.replace('127.0.0.1', 'host.docker.internal') : baseUrl;
-    }
-
-    const response = await fetch(`${baseUrl}/api/tags`);
-    const data = (await response.json()) as OllamaApiResponse;
-
-    // console.log({ ollamamodels: data.models });
-
-    return data.models.map((model: OllamaModel) => ({
-      name: model.name,
-      label: `${model.name} (${model.details.parameter_size})`,
-      provider: this.name,
-      maxTokenAllowed: 8000,
-    }));
+  constructor(options: ProviderOptions = {}) {
+    this.baseUrl = options.baseUrl || 'http://localhost:11434';
+    this.apiKey = options.apiKey; // Ollama ne nécessite généralement pas de clé API en local
+    this.defaultModel = options.defaultModel || 'llama2';
   }
-  getModelInstance: (options: {
-    model: string;
-    serverEnv?: Env;
-    apiKeys?: Record<string, string>;
-    providerSettings?: Record<string, IProviderSetting>;
-  }) => LanguageModelV1 = (options) => {
-    const { apiKeys, providerSettings, serverEnv, model } = options;
-    let { baseUrl } = this.getProviderBaseUrlAndKey({
-      apiKeys,
-      providerSettings: providerSettings?.[this.name],
-      serverEnv: serverEnv as any,
-      defaultBaseUrlKey: 'OLLAMA_API_BASE_URL',
-      defaultApiTokenKey: '',
-    });
 
-    // Backend: Check if we're running in Docker
-    if (!baseUrl) {
-      throw new Error('No baseUrl found for OLLAMA provider');
+  async listModels(): Promise<ModelInfo[]> {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/tags`);
+      if (!response.ok) {
+        throw new Error(`Erreur lors de la récupération des modèles: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      
+      return data.models.map((model: any) => ({
+        id: model.name,
+        name: model.name,
+        provider: this.id,
+        capabilities: ['chat', 'completion'],
+        contextLength: model.parameters?.context_length || 4096,
+        supportsFunctions: false,
+        supportsVision: false
+      }));
+    } catch (error) {
+      logger.error(`[OllamaProvider] Erreur lors de la récupération des modèles`, error);
+      return [];
     }
+  }
 
-    const isDocker = process?.env?.RUNNING_IN_DOCKER === 'true' || serverEnv?.RUNNING_IN_DOCKER === 'true';
-    baseUrl = isDocker ? baseUrl.replace('localhost', 'host.docker.internal') : baseUrl;
-    baseUrl = isDocker ? baseUrl.replace('127.0.0.1', 'host.docker.internal') : baseUrl;
+  async chat(
+    messages: ChatMessage[],
+    model: string = this.defaultModel,
+    options: any = {}
+  ): Promise<LLMResponse> {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model,
+          messages: messages.map(msg => ({
+            role: msg.role,
+            content: msg.content
+          })),
+          stream: false,
+          options: {
+            temperature: options.temperature || 0.7,
+            top_p: options.top_p || 0.9,
+            max_tokens: options.max_tokens || 1024
+          }
+        }),
+      });
 
-    logger.debug('Ollama Base Url used: ', baseUrl);
+      if (!response.ok) {
+        throw new Error(`Erreur lors de l'appel à l'API Ollama: ${response.statusText}`);
+      }
 
-    const ollamaInstance = ollama(model, {
-      numCtx: DEFAULT_NUM_CTX,
-    }) as LanguageModelV1 & { config: any };
+      const data = await response.json();
+      
+      return {
+        id: `ollama-${Date.now()}`,
+        content: data.message.content,
+        model,
+        provider: this.id,
+        usage: {
+          promptTokens: -1, // Ollama ne fournit pas cette métrique
+          completionTokens: -1,
+          totalTokens: -1
+        }
+      };
+    } catch (error) {
+      logger.error(`[OllamaProvider] Erreur lors de l'appel au modèle`, error);
+      throw new Error(`Erreur lors de l'appel au modèle Ollama: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+    }
+  }
 
-    ollamaInstance.config.baseURL = `${baseUrl}/api`;
+  async completion(
+    prompt: string,
+    model: string = this.defaultModel,
+    options: any = {}
+  ): Promise<LLMResponse> {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model,
+          prompt,
+          stream: false,
+          options: {
+            temperature: options.temperature || 0.7,
+            top_p: options.top_p || 0.9,
+            max_tokens: options.max_tokens || 1024
+          }
+        }),
+      });
 
-    return ollamaInstance;
-  };
+      if (!response.ok) {
+        throw new Error(`Erreur lors de l'appel à l'API Ollama: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      
+      return {
+        id: `ollama-${Date.now()}`,
+        content: data.response,
+        model,
+        provider: this.id,
+        usage: {
+          promptTokens: -1,
+          completionTokens: -1,
+          totalTokens: -1
+        }
+      };
+    } catch (error) {
+      logger.error(`[OllamaProvider] Erreur lors de l'appel au modèle`, error);
+      throw new Error(`Erreur lors de l'appel au modèle Ollama: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+    }
+  }
 }
+
+export default OllamaProvider;

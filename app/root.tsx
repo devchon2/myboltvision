@@ -1,18 +1,16 @@
 import { useStore } from '@nanostores/react';
 import type { LinksFunction } from '@remix-run/cloudflare';
-import { Links, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
-import tailwindReset from '@unocss/reset/tailwind-compat.css?url';
+import { json, type LoaderFunctionArgs } from '@remix-run/cloudflare';
+import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from '@remix-run/react';
 import { themeStore } from './lib/stores/theme';
 import { stripIndents } from './utils/stripIndent';
 import { createHead } from 'remix-island';
 import { useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { logStore } from './lib/stores/logs';
 
-import reactToastifyStyles from 'react-toastify/dist/ReactToastify.css?url';
-import globalStyles from './styles/index.scss?url';
-import xtermStyles from '@xterm/xterm/css/xterm.css?url';
-
+// Importation des styles via UnoCSS
 import 'virtual:uno.css';
 
 export const links: LinksFunction = () => [
@@ -21,10 +19,10 @@ export const links: LinksFunction = () => [
     href: '/favicon.svg',
     type: 'image/svg+xml',
   },
-  { rel: 'stylesheet', href: reactToastifyStyles },
-  { rel: 'stylesheet', href: tailwindReset },
-  { rel: 'stylesheet', href: globalStyles },
-  { rel: 'stylesheet', href: xtermStyles },
+  { rel: 'stylesheet', href: '/css/tailwind-reset.css' },
+  { rel: 'stylesheet', href: '/css/xterm.css' },
+  { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/react-toastify@11.0.5/dist/ReactToastify.min.css' },
+  { rel: 'stylesheet', href: '/css/index.scss' },
   {
     rel: 'preconnect',
     href: 'https://fonts.googleapis.com',
@@ -80,7 +78,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-import { logStore } from './lib/stores/logs';
+export async function loader({ request }: LoaderFunctionArgs) {
+  // Retourner au minimum un objet vide pour répondre aux requêtes root
+  return json({});
+}
+
+export const indexLoader = async () => {
+  return json({
+    message: "Welcome to BoltVision"
+  });
+};
 
 export default function App() {
   const theme = useStore(themeStore);
@@ -98,5 +105,15 @@ export default function App() {
     <Layout>
       <Outlet />
     </Layout>
+  );
+}
+
+export function Index() {
+  const data = useLoaderData();
+  
+  return (
+    <div>
+      <h1>Welcome to BoltVision - {(data as { message: string }).message}</h1>
+    </div>
   );
 }

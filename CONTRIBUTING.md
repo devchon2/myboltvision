@@ -1,242 +1,268 @@
-# Contribution Guidelines
+# Guide de contribution - MyBoltVision
 
-Welcome! This guide provides all the details you need to contribute effectively to the project. Thank you for helping us make **bolt.diy** a better tool for developers worldwide. 💡
+Nous sommes ravis que vous envisagiez de contribuer à MyBoltVision! Ce document fournit les directives et les bonnes pratiques pour contribuer efficacement au projet.
 
----
+## Table des matières
 
-## 📋 Table of Contents
+- [Code de conduite](#code-de-conduite)
+- [Comment commencer](#comment-commencer)
+- [Processus de développement](#processus-de-développement)
+- [Soumettre des modifications](#soumettre-des-modifications)
+- [Standards de code](#standards-de-code)
+- [Soumettre un bug](#soumettre-un-bug)
+- [Proposer une nouvelle fonctionnalité](#proposer-une-nouvelle-fonctionnalité)
+- [Ajouter un agent](#ajouter-un-agent)
+- [Ajouter un fournisseur LLM](#ajouter-un-fournisseur-llm)
 
-1. [Code of Conduct](#code-of-conduct)
-2. [How Can I Contribute?](#how-can-i-contribute)
-3. [Pull Request Guidelines](#pull-request-guidelines)
-4. [Coding Standards](#coding-standards)
-5. [Development Setup](#development-setup)
-6. [Testing](#testing)
-7. [Deployment](#deployment)
-8. [Docker Deployment](#docker-deployment)
-9. [VS Code Dev Containers Integration](#vs-code-dev-containers-integration)
+## Code de conduite
 
----
+Ce projet et tous ses participants sont régis par notre [Code de conduite](CODE_OF_CONDUCT.md). En participant, vous acceptez de respecter ce code. Veuillez signaler tout comportement inacceptable.
 
-## 🛡️ Code of Conduct
+## Comment commencer
 
-This project is governed by our **Code of Conduct**. By participating, you agree to uphold this code. Report unacceptable behavior to the project maintainers.
+### Prérequis
 
----
+- Node.js (v18.0.0 ou supérieur)
+- npm (v8.0.0 ou supérieur)
+- Git
 
-## 🛠️ How Can I Contribute?
+### Installation pour le développement
 
-### 1️⃣ Reporting Bugs or Feature Requests
-
-- Check the [issue tracker](#) to avoid duplicates.
-- Use issue templates (if available).
-- Provide detailed, relevant information and steps to reproduce bugs.
-
-### 2️⃣ Code Contributions
-
-1. Fork the repository.
-2. Create a feature or fix branch.
-3. Write and test your code.
-4. Submit a pull request (PR).
-
-### 3️⃣ Join as a Core Contributor
-
-Interested in maintaining and growing the project? Fill out our [Contributor Application Form](https://forms.gle/TBSteXSDCtBDwr5m7).
-
----
-
-## ✅ Pull Request Guidelines
-
-### PR Checklist
-
-- Branch from the **main** branch.
-- Update documentation, if needed.
-- Test all functionality manually.
-- Focus on one feature/bug per PR.
-
-### Review Process
-
-1. Manual testing by reviewers.
-2. At least one maintainer review required.
-3. Address review comments.
-4. Maintain a clean commit history.
-
----
-
-## 📏 Coding Standards
-
-### General Guidelines
-
-- Follow existing code style.
-- Comment complex logic.
-- Keep functions small and focused.
-- Use meaningful variable names.
-
----
-
-## 🖥️ Development Setup
-
-### 1️⃣ Initial Setup
-
-- Clone the repository:
-  ```bash
-  git clone https://github.com/stackblitz-labs/bolt.diy.git
-  ```
-- Install dependencies:
-  ```bash
-  pnpm install
-  ```
-- Set up environment variables:
-  1. Rename `.env.example` to `.env.local`.
-  2. Add your API keys:
-     ```bash
-     GROQ_API_KEY=XXX
-     HuggingFace_API_KEY=XXX
-     OPENAI_API_KEY=XXX
-     ...
-     ```
-  3. Optionally set:
-     - Debug level: `VITE_LOG_LEVEL=debug`
-     - Context size: `DEFAULT_NUM_CTX=32768`
-
-**Note**: Never commit your `.env.local` file to version control. It’s already in `.gitignore`.
-
-### 2️⃣ Run Development Server
-
+1. Forkez le dépôt sur GitHub
+2. Clonez votre fork localement
 ```bash
-pnpm run dev
+git clone https://github.com/votre-nom-utilisateur/myboltvision.git
+cd myboltvision
+```
+3. Ajoutez le dépôt principal comme remote
+```bash
+git remote add upstream https://github.com/organisation-principale/myboltvision.git
+```
+4. Installez les dépendances
+```bash
+npm install
+```
+5. Créez une branche pour vos modifications
+```bash
+git checkout -b ma-fonctionnalite
 ```
 
-**Tip**: Use **Google Chrome Canary** for local testing.
+## Processus de développement
 
----
+Notre processus de développement suit une approche orientée qualité basée sur les principes de GitHub Flow:
 
-## 🧪 Testing
+1. Créez une branche à partir de `main` pour vos modifications
+2. Effectuez vos modifications en suivant nos standards de code
+3. Vérifiez que les tests passent avec `npm run test:report`
+4. Validez la qualité du code avec linting et analyse statique
+5. Soumettez une Pull Request (PR) détaillée
+6. Passez en revue les analyses automatiques de qualité
+7. Participez à la revue de code et apportez les ajustements nécessaires
+8. Une fois approuvée, votre PR sera fusionnée dans le tronc principal
 
-Run the test suite with:
+### Branches
 
+- `main` - Branche principale, toujours stable
+- `dev` - Branche de développement
+- `feature/*` - Pour les nouvelles fonctionnalités
+- `fix/*` - Pour les corrections de bugs
+- `docs/*` - Pour les modifications de documentation
+
+## Soumettre des modifications
+
+### Pull Requests
+
+1. Assurez-vous que votre branche est à jour avec la branche principale
 ```bash
-pnpm test
+git pull upstream main
+```
+2. Commitez vos changements avec des messages clairs et descriptifs
+3. Poussez vos modifications sur votre fork
+```bash
+git push origin ma-fonctionnalite
+```
+4. Créez une Pull Request via GitHub
+5. Décrivez clairement vos modifications dans la description de la PR
+
+### Format des messages de commit
+
+Nous suivons le format [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+<type>(<scope>): <description>
+
+[corps optionnel]
+
+[pied de page optionnel]
+```
+
+Types courants:
+- `feat` - Nouvelle fonctionnalité
+- `fix` - Correction de bug
+- `docs` - Modification de documentation
+- `style` - Formatage, points-virgules manquants, etc.
+- `refactor` - Refactorisation du code
+- `test` - Ajout ou correction de tests
+- `chore` - Tâches de maintenance
+
+Exemple:
+```
+feat(ideation): ajouter évaluation automatique des idées
+
+Ajoute un système qui évalue automatiquement les idées générées
+selon plusieurs critères: innovation, faisabilité, potentiel commercial.
+
+Closes #123
+```
+
+## Standards de code
+
+### Style de code
+
+Nous utilisons ESLint et Prettier pour maintenir un style de code cohérent:
+
+- Tabs vs Spaces: 2 espaces
+- Points-virgules: obligatoires
+- Quotes: simples
+- Longueur de ligne maximale: 100 caractères
+
+Exécutez `npm run lint` pour vérifier votre code et `npm run format` pour formater automatiquement.
+
+### TypeScript
+
+- Toujours utiliser des types explicites pour les fonctions publiques
+- Éviter `any` autant que possible
+- Documenter les interfaces et les types complexes
+
+### Tests
+
+- Les nouveaux composants doivent avoir des tests unitaires
+- Les nouvelles fonctionnalités doivent avoir des tests d'intégration
+- Maintenir une couverture de test d'au moins 80%
+
+## Soumettre un bug
+
+Si vous trouvez un bug, veuillez créer une issue sur GitHub en utilisant le modèle "Bug Report" et inclure:
+
+- Une description claire du bug
+- Les étapes pour reproduire
+- Le comportement attendu
+- Le comportement observé
+- Des captures d'écran si nécessaire
+- Votre environnement (OS, navigateur, version Node.js)
+
+## Proposer une nouvelle fonctionnalité
+
+Pour proposer une nouvelle fonctionnalité:
+
+1. Créez une issue en utilisant le modèle "Feature Request"
+2. Décrivez clairement la fonctionnalité et son cas d'utilisation
+3. Expliquez pourquoi cette fonctionnalité serait bénéfique au projet
+4. Si possible, décrivez comment vous envisagez de l'implémenter
+
+## Ajouter un agent
+
+MyBoltVision est conçu pour être facilement extensible avec de nouveaux agents. Pour ajouter un nouvel agent:
+
+1. Créez un nouveau fichier dans `app/lib/agents/`
+2. Implémentez l'interface `Agent`
+3. Assurez-vous de documenter clairement les capacités de l'agent
+4. Ajoutez des tests unitaires dans `app/lib/agents/__tests__/`
+5. Mettez à jour le registre des agents dans `app/lib/agents/registry.ts`
+
+Exemple de structure d'agent:
+
+```typescript
+import type { Agent, AgentResult } from '../core/AgentOrchestrator';
+import type { ContextShard } from '../../types/context';
+
+export class MonNouvelAgent implements Agent {
+  id: string;
+  name: string;
+  description: string;
+  capabilities: string[];
+  
+  constructor() {
+    this.id = 'mon-nouvel-agent';
+    this.name = 'Mon Nouvel Agent';
+    this.description = 'Description de mon agent et ses capacités';
+    this.capabilities = [
+      'capacité-1',
+      'capacité-2',
+      'capacité-3'
+    ];
+  }
+  
+  async execute(input: string, context: ContextShard): Promise<AgentResult> {
+    // Implémentation de la logique de l'agent
+    
+    return {
+      id: `result_${Date.now()}`,
+      agentId: this.id,
+      content: 'Résultat de l\'exécution',
+      timestamp: Date.now(),
+      metadata: {
+        // Métadonnées spécifiques
+      },
+      success: true
+    };
+  }
+  
+  // Méthodes supplémentaires spécifiques à l'agent
+}
+```
+
+## Ajouter un fournisseur LLM
+
+Pour ajouter un nouveau fournisseur LLM:
+
+1. Créez un nouveau fichier dans `app/lib/modules/llm/providers/`
+2. Étendez la classe `BaseProvider`
+3. Implémentez les méthodes requises
+4. Ajoutez le provider à `app/lib/modules/llm/registry.ts`
+
+Exemple:
+
+```typescript
+import { BaseProvider } from '../base-provider';
+import type { ModelInfo } from '../types';
+import type { IProviderSetting } from '~/types/model';
+
+export class MonNouveauProvider extends BaseProvider {
+  constructor() {
+    super();
+    this.name = 'mon-nouveau-provider';
+    this.staticModels = [
+      {
+        name: 'modele-par-defaut',
+        displayName: 'Modèle par défaut',
+        provider: this.name,
+        parameters: {
+          temperature: 0.7,
+          maxTokens: 2048
+        }
+      }
+    ];
+    this.getApiKeyLink = 'https://provider.com/api-keys';
+    this.labelForGetApiKey = 'Obtenir une clé API';
+    this.icon = '/icons/MonProvider.svg';
+  }
+
+  // Implémentation des méthodes requises pour interroger l'API du provider
+  
+  async getDynamicModels(
+    apiKeys?: Record<string, string>,
+    settings?: IProviderSetting,
+    serverEnv?: Record<string, string>
+  ): Promise<ModelInfo[]> {
+    // Logique pour obtenir la liste des modèles disponibles
+    return [];
+  }
+}
 ```
 
 ---
 
-## 🚀 Deployment
+Merci pour votre intérêt à contribuer à MyBoltVision! Ensemble, nous pouvons créer un outil puissant qui transforme la façon dont les projets sont développés.
 
-### Deploy to Cloudflare Pages
-
-```bash
-pnpm run deploy
-```
-
-Ensure you have required permissions and that Wrangler is configured.
-
----
-
-## 🐳 Docker Deployment
-
-This section outlines the methods for deploying the application using Docker. The processes for **Development** and **Production** are provided separately for clarity.
-
----
-
-### 🧑‍💻 Development Environment
-
-#### Build Options
-
-**Option 1: Helper Scripts**
-
-```bash
-# Development build
-npm run dockerbuild
-```
-
-**Option 2: Direct Docker Build Command**
-
-```bash
-docker build . --target bolt-ai-development
-```
-
-**Option 3: Docker Compose Profile**
-
-```bash
-docker compose --profile development up
-```
-
-#### Running the Development Container
-
-```bash
-docker run -p 5173:5173 --env-file .env.local bolt-ai:development
-```
-
----
-
-### 🏭 Production Environment
-
-#### Build Options
-
-**Option 1: Helper Scripts**
-
-```bash
-# Production build
-npm run dockerbuild:prod
-```
-
-**Option 2: Direct Docker Build Command**
-
-```bash
-docker build . --target bolt-ai-production
-```
-
-**Option 3: Docker Compose Profile**
-
-```bash
-docker compose --profile production up
-```
-
-#### Running the Production Container
-
-```bash
-docker run -p 5173:5173 --env-file .env.local bolt-ai:production
-```
-
----
-
-### Coolify Deployment
-
-For an easy deployment process, use [Coolify](https://github.com/coollabsio/coolify):
-
-1. Import your Git repository into Coolify.
-2. Choose **Docker Compose** as the build pack.
-3. Configure environment variables (e.g., API keys).
-4. Set the start command:
-   ```bash
-   docker compose --profile production up
-   ```
-
----
-
-## 🛠️ VS Code Dev Containers Integration
-
-The `docker-compose.yaml` configuration is compatible with **VS Code Dev Containers**, making it easy to set up a development environment directly in Visual Studio Code.
-
-### Steps to Use Dev Containers
-
-1. Open the command palette in VS Code (`Ctrl+Shift+P` or `Cmd+Shift+P` on macOS).
-2. Select **Dev Containers: Reopen in Container**.
-3. Choose the **development** profile when prompted.
-4. VS Code will rebuild the container and open it with the pre-configured environment.
-
----
-
-## 🔑 Environment Variables
-
-Ensure `.env.local` is configured correctly with:
-
-- API keys.
-- Context-specific configurations.
-
-Example for the `DEFAULT_NUM_CTX` variable:
-
-```bash
-DEFAULT_NUM_CTX=24576 # Uses 32GB VRAM
-```
+Si vous avez des questions ou besoin d'aide, n'hésitez pas à contacter l'équipe de développement.

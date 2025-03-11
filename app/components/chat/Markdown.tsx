@@ -11,13 +11,16 @@ import ThoughtBox from './ThoughtBox';
 
 const logger = createScopedLogger('MarkdownComponent');
 
-interface MarkdownProps {
-  children: string;
+export interface MarkdownProps {
+  children?: string;
+  content?: string;
   html?: boolean;
   limitedMarkdown?: boolean;
 }
 
-export const Markdown = memo(({ children, html = false, limitedMarkdown = false }: MarkdownProps) => {
+export const Markdown = memo(({ children, content, html = false, limitedMarkdown = false }: MarkdownProps) => {
+  // Utiliser soit content soit children
+  const textContent = content || children || '';
   logger.trace('Render');
 
   const components = useMemo(() => {
@@ -73,7 +76,7 @@ export const Markdown = memo(({ children, html = false, limitedMarkdown = false 
       remarkPlugins={remarkPlugins(limitedMarkdown)}
       rehypePlugins={rehypePlugins(html)}
     >
-      {stripCodeFenceFromArtifact(children)}
+      {stripCodeFenceFromArtifact(textContent)}
     </ReactMarkdown>
   );
 });
