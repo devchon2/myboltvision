@@ -1,71 +1,241 @@
+# Workflow CI/CD MyBoltVision
+# Pipeline complet pour tester, construire et déployer l'application
+
 name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, develop]
+    branches: [ main, develop ]
   pull_request:
-    branches: [main, develop]
-
-env:
-  # IMPORTANT : Configurez ces secrets dans les paramètres de votre dépôt GitHub
-  # Valeurs par défaut temporaires - À REMPLACER IMPÉRATIVEMENT
-  API_URL: ${{ secrets.API_URL || 'https://api.example.com' }}
-  AUTH_SECRET: ${{ secrets.AUTH_SECRET || 'default-secret-key' }}
-  APP_URL: ${{ secrets.APP_URL || 'https://myboltvision.app' }}
-  MONITORING_API: ${{ secrets.MONITORING_API || 'https://monitoring.example.com' }}
-  MONITORING_TOKEN: ${{ secrets.MONITORING_TOKEN || 'default-monitoring-token' }}
-  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || '' }}
-  SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK || '' }}
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environnement de déploiement'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - production
 
 jobs:
-  build-and-test:
+  # ===== PHASE 1: VALIDATION ET TESTS =====
+  validate:
+    name: Validation et Tests
     runs-on: ubuntu-latest
-
+    
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Utiliser Node.js
+      - name: Checkout du code
+        uses: actions/checkout@v3
+      
+      - name: Configuration de Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'pnpm'
-
-      - name: Installer pnpm
-        run: npm install -g pnpm
-
-      - name: Installer les dépendances
-        run: pnpm install
-
-      - name: Linter
-        run: pnpm run lint
-
-      - name: Tests
-        run: pnpm run test
-
-      - name: Build
-        run: pnpm run build
-        env:
-          # Variables spécifiques au build
-          NODE_ENV: production
-
-  deploy:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Déployer sur Vercel
-        run: npx vercel deploy --prod
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-
-      - name: Notification Slack
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          text: "Déploiement de MyBoltVision terminé\nStatut: ${{ job.status }}\nRépositoire: ${{ github.repository }}\nCommit: ${{ github.sha }}"
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+      
+      - name: Installation des dépendances
+        run: |
+          npm install -g pnpm
+          pnpm install
+      
+      - name: Linting
+        run: pnpm lint
+      
+      - name: Tests unitaires
+        run: pnpm test
+        
+      - name: Analyse de code statique
+        run: |
+          pnpm eslint --ext .js,.jsx,.ts,.tsx . -f json -o eslint-results.json
+      
+      - name: Upload des résultats d'analyse
         if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: eslint-results
+          path: eslint-results.json
+          
+  # ===== PHASE 2: CONSTRUCTION ET OPTIMISATION =====
+  build:
+    name: Construction et Optimisation
+    needs: validate
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v3
+      
+      - name: Configuration de Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+      
+      - name: Installation des dépendances
+        run: |
+          npm install -g pnpm
+          pnpm install
+      
+      - name: Analyse des bundles
+        run: |
+          mkdir -p reports
+          ANALYZE=true pnpm build
+          
+      - name: Construction de la production
+        run: pnpm build
+      
+      - name: Tests de performance
+        run: |
+          npx lighthouse-ci https://staging-app-url.example.com \
+            --output=json \
+            --output-path=./reports/lighthouse-report.json
+            
+      - name: Archivage des artefacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: |
+            .next
+            reports
+            
+  # ===== PHASE 3: TESTS E2E ET INTÉGRATION =====
+  e2e-tests:
+    name: Tests E2E
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v3
+      
+      - name: Configuration de Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+      
+      - name: Installation des dépendances
+        run: |
+          npm install -g pnpm
+          pnpm install
+      
+      - name: Récupération des artefacts de build
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+      
+      - name: Installation de Cypress
+        run: pnpm add -D cypress @testing-library/cypress cypress-image-snapshot
+      
+      - name: Démarrage du serveur en arrière-plan
+        run: pnpm start & echo $! > server.pid
+      
+      - name: Exécution des tests Cypress
+        run: |
+          npx cypress run --config-file cypress.config.js
+      
+      - name: Arrêt du serveur
+        run: kill $(cat server.pid)
+      
+      - name: Upload des résultats de test
+        uses: actions/upload-artifact@v3
+        with:
+          name: cypress-results
+          path: cypress/screenshots
+    
+  # ===== PHASE 4: DÉPLOIEMENT =====
+  deploy:
+    name: Déploiement
+    needs: [build, e2e-tests]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    environment:
+      name: ${{ github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'production') || 'dev' }}
+    
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v3
+      
+      - name: Configuration de Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+      
+      - name: Récupération des artefacts de build
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+      
+      - name: Configuration des variables d'environnement
+        run: |
+          if [[ "${{ secrets.API_URL }}" != "" ]]; then
+            echo "API_URL=${{ secrets.API_URL }}" > .env.production
+          fi
+          if [[ "${{ secrets.AUTH_SECRET }}" != "" ]]; then
+            echo "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" >> .env.production
+          fi
+      
+      - name: Installation de Vercel CLI
+        run: npm install -g vercel
+        
+      - name: Déploiement sur l'environnement cible
+        if: ${{ secrets.VERCEL_TOKEN != '' }}
+        run: |
+          vercel deploy --token="${{ secrets.VERCEL_TOKEN }}" \
+            --prod \
+            --yes
+      
+      - name: Définir environment pour message
+        id: set-env
+        run: |
+          if [ ! -z "${{ github.event.inputs.environment }}" ]; then
+            echo "env_name=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "env_name=production" >> $GITHUB_OUTPUT
+          else
+            echo "env_name=dev" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Notification de déploiement
+        if: ${{ secrets.SLACK_WEBHOOK != '' }}
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: 'Application déployée avec succès sur ${{ steps.set-env.outputs.env_name }} :rocket:'
+          SLACK_TITLE: Déploiement réussi
+          SLACK_COLOR: good
+
+  # ===== PHASE 5: MONITORING POST-DÉPLOIEMENT =====
+  monitor:
+    name: Monitoring
+    needs: deploy
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Vérification de l'état du site
+        if: ${{ secrets.APP_URL != '' }}
+        run: |
+          curl -sSf ${{ secrets.APP_URL }}/api/health || exit 1
+      
+      - name: Tests de smoke post-déploiement
+        run: |
+          npm install -g newman
+          if [[ -f "./tests/postman/smoke-tests.json" ]]; then
+            ENV_FILE="./tests/postman/environments/${{ github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'production' || 'dev') }}.json"
+            if [[ -f "$ENV_FILE" ]]; then
+              newman run ./tests/postman/smoke-tests.json --environment "$ENV_FILE"
+            else
+              newman run ./tests/postman/smoke-tests.json
+            fi
+          fi
+      
+      - name: Configuration des alertes de performance
+        if: ${{ secrets.MONITORING_API != '' && secrets.MONITORING_TOKEN != '' && secrets.APP_URL != '' }}
+        run: |
+          curl -X POST ${{ secrets.MONITORING_API }}/setup \
+            -H "Authorization: Bearer ${{ secrets.MONITORING_TOKEN }}" \
+            -d '{"url": "${{ secrets.APP_URL }}", "thresholds": {"lcp": 2500, "fid": 100, "cls": 0.1}}'
