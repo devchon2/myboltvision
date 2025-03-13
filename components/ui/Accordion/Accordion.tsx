@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, ReactElement, ReactNode, Children, cloneElement } from 'react';
-import type styles from './Accordion.module.scss'
+import styles from './Accordion.module.scss'
 
 export interface AccordionItemProps {
   /**
