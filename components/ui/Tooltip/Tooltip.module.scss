@@ -1,0 +1,77 @@
+.tooltipTrigger {
+  display: inline-block;
+  position: relative;
+}
+
+.tooltip {
+  position: fixed;
+  z-index: 1000;
+  background-color: var(--tooltip-bg, rgba(0, 0, 0, 0.8));
+  color: var(--tooltip-text, white);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  max-width: 250px;
+  word-wrap: break-word;
+  pointer-events: auto;
+
+  &.top .tooltipArrow {
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    border-bottom-right-radius: 2px;
+  }
+
+  &.bottom .tooltipArrow {
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    border-top-left-radius: 2px;
+  }
+
+  &.left .tooltipArrow {
+    right: -5px;
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg);
+    border-top-right-radius: 2px;
+  }
+
+  &.right .tooltipArrow {
+    left: -5px;
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg);
+    border-bottom-left-radius: 2px;
+  }
+}
+
+.tooltipContent {
+  position: relative;
+  z-index: 1;
+}
+
+.tooltipArrow {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: var(--tooltip-bg, rgba(0, 0, 0, 0.8));
+}
+
+/* Animation pour l'apparition du tooltip */
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.tooltip {
+  animation: tooltipFadeIn 0.15s ease-out forwards;
+}

@@ -15,20 +15,13 @@ try {
 
 // Replace the problematic function in server.js directly
 try {
-  const serverRuntimePath = path.join(
-    __dirname, 
-    'node_modules', 
-    '@remix-run', 
-    'server-runtime', 
-    'dist', 
-    'server.js'
-  );
+  const serverRuntimePath = path.join(__dirname, 'node_modules', '@remix-run', 'server-runtime', 'dist', 'server.js');
 
   if (fs.existsSync(serverRuntimePath)) {
     console.log('🔍 Fixing handleDocumentRequestFunction issue...');
-    
+
     let content = fs.readFileSync(serverRuntimePath, 'utf8');
-    
+
     // Replace the problematic handleDocumentRequest function
     const patchedFunction = `
 async function handleDocumentRequest(request, responseStatusCode, responseHeaders, entryContext, loadContext) {
@@ -43,9 +36,9 @@ async function handleDocumentRequest(request, responseStatusCode, responseHeader
     if (content.includes('handleDocumentRequestFunction(')) {
       content = content.replace(
         /async function handleDocumentRequest\([^{]*{[\s\S]*?handleDocumentRequestFunction\([^}]*}/,
-        patchedFunction
+        patchedFunction,
       );
-      
+
       fs.writeFileSync(serverRuntimePath, content);
       console.log('✅ handleDocumentRequestFunction issue fixed');
     } else {

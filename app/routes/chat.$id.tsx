@@ -1,8 +1,12 @@
-import { json, type LoaderFunctionArgs } from '@remix-run/cloudflare';
-import { default as IndexRoute } from './_index';
+import type { GetServerSideProps } from 'next';
+import IndexRoute from '../../pages/index';
 
-export async function loader(args: LoaderFunctionArgs) {
-  return json({ id: args.params.id });
-}
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  return {
+    props: {
+      id: context.params?.id,
+    },
+  };
+};
 
 export default IndexRoute;

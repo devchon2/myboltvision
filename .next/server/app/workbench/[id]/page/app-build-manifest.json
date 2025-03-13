@@ -1,0 +1,33 @@
+{
+  "pages": {
+    "/workbench/[id]/page": [
+      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_f260f7fc._.js",
+      "static/chunks/1c5ac_next_dist_3e978d26._.js",
+      "static/chunks/components_auth_AuthContext_tsx_8e60729c._.js",
+      "static/chunks/app_layout_tsx_a4c3f080._.js",
+      "static/chunks/app_error_tsx_1c4448c8._.js",
+      "static/chunks/app_error_tsx_7a454430._.js",
+      "static/chunks/_80dcd3fd._.js",
+      "static/chunks/_bbce96b3._.js",
+      "static/chunks/node_modules__pnpm_357c07a7._.js",
+      "static/chunks/a2029_micromark_dev_lib_33943764._.js",
+      "static/chunks/42800_micromark-core-commonmark_dev_lib_f3ec2821._.js",
+      "static/chunks/955e3_parse5_dist_02a78858._.js",
+      "static/chunks/04050_framer-motion_dist_es_c3506ce1._.js",
+      "static/chunks/cb21c_motion-dom_dist_es_c1bff1c0._.js",
+      "static/chunks/05b4d_zod_lib_index_mjs_b32e4c10._.js",
+      "static/chunks/769e7_@ai-sdk_openai_dist_index_mjs_a3b9fe8a._.js",
+      "static/chunks/9b110_@octokit_plugin-rest-endpoint-methods_dist-src_e66c7b85._.js",
+      "static/chunks/node_modules__pnpm_57f4c618._.js",
+      "static/chunks/app_components_chat_d4c57672._.css",
+      "static/chunks/app_workbench_[id]_page_tsx_7a454430._.js",
+      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_d1e1793d._.js",
+      "static/chunks/1c5ac_next_dist_compiled_0cc85728._.js",
+      "static/chunks/1c5ac_next_dist_client_b1436256._.js",
+      "static/chunks/1c5ac_next_dist_709fa073._.js",
+      "static/chunks/61dca_@swc_helpers_cjs_e27e0aca._.js",
+      "static/chunks/_e69f0d32._.js",
+      "static/chunks/_93a9381f._.js"
+    ]
+  }
+}

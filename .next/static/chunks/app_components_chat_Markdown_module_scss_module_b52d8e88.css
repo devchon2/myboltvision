@@ -1,0 +1,169 @@
+/* [project]/app/components/chat/Markdown.module.scss.module.css [app-client] (css) */
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent {
+  line-height: 1.6;
+  color: var(--bolt-elements-textPrimary);
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent > :not(:last-child) {
+  margin-block-end: 16px;
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent .artifact {
+  margin: 1.5em 0;
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent :is(h1, h2, h3, h4, h5, h6):not(:has(.actions), .actions *) {
+  margin-block-start: 24px;
+  margin-block-end: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--bolt-elements-textPrimary);
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent h1 {
+  font-size: 2em;
+  border-bottom: 1px solid var(--bolt-elements-borderColor);
+  padding-bottom: 0.3em;
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent h2 {
+  font-size: 1.5em;
+  border-bottom: 1px solid var(--bolt-elements-borderColor);
+  padding-bottom: 0.3em;
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent h3 {
+  font-size: 1.25em;
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent h4 {
+  font-size: 1em;
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent h5 {
+  font-size: 0.875em;
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent h6 {
+  font-size: 0.85em;
+  color: #6a737d;
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent p {
+  white-space: pre-wrap;
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent p:not(:last-of-type) {
+  margin-block-start: 0;
+  margin-block-end: 16px;
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent a {
+  color: var(--bolt-elements-messages-linkColor);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent a:hover {
+  text-decoration: underline;
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent :not(pre) > code {
+  font-family:
+    ui-monospace,
+    Fira Code,
+    Menlo,
+    Monaco,
+    Consolas,
+    Liberation Mono,
+    Courier New,
+    monospace;
+  font-size: 13px;
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent :not(pre) > code:not(:has(.actions), .actions *) {
+  border-radius: 6px;
+  padding: 0.2em 0.4em;
+  background-color: var(--bolt-elements-messages-inlineCode-background);
+  color: var(--bolt-elements-messages-inlineCode-text);
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent pre {
+  padding: 20px 16px;
+  border-radius: 6px;
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent pre:has(> code) {
+  font-family:
+    ui-monospace,
+    Fira Code,
+    Menlo,
+    Monaco,
+    Consolas,
+    Liberation Mono,
+    Courier New,
+    monospace;
+  font-size: 13px;
+  background: none;
+  overflow-x: auto;
+  min-width: 0;
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent blockquote {
+  margin: 0;
+  padding: 0 1em;
+  color: var(--bolt-elements-textTertiary);
+  border-left: 0.25em solid var(--bolt-elements-borderColor);
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent :is(ul, ol):not(:has(.actions), .actions *) {
+  padding-left: 2em;
+  margin-block-start: 0;
+  margin-block-end: 16px;
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent ul:not(:has(.actions), .actions *) {
+  list-style-type: disc;
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent ol:not(:has(.actions), .actions *) {
+  list-style-type: decimal;
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent li:not(:has(.actions), .actions *) + li {
+  margin-block-start: 8px;
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent li:not(:has(.actions), .actions *) > :not(:last-child) {
+  margin-block-end: 16px;
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent img {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent hr {
+  height: 0.25em;
+  padding: 0;
+  margin: 24px 0;
+  background-color: var(--bolt-elements-borderColor);
+  border: 0;
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-block-end: 16px;
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent table :is(th, td) {
+  padding: 6px 13px;
+  border: 1px solid #dfe2e5;
+}
+
+.Markdown-module-scss-module__VSJ-WW__MarkdownContent table tr:nth-child(2n) {
+  background-color: #f6f8fa;
+}
+
+/*# sourceMappingURL=app_components_chat_Markdown_module_scss_module_b52d8e88.css.map*/

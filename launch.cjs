@@ -15,7 +15,7 @@ console.log('          ⚡️  Démarrage  ⚡️         ');
 console.log('★═══════════════════════════════════════★\n');
 
 // Exécuter la séquence de démarrage
-console.log('1. Initialisation de l\'environnement...');
+console.log("1. Initialisation de l'environnement...");
 execSync('node pre-start.cjs', { stdio: 'inherit' });
 
 console.log('\n2. Application des polyfills...');
@@ -27,7 +27,7 @@ const viteProcess = spawn('npx', ['vite'], { stdio: 'inherit', shell: true });
 
 // Gérer la sortie propre
 process.on('SIGINT', () => {
-  console.log('\n👋 Arrêt de l\'application...');
+  console.log("\n👋 Arrêt de l'application...");
   viteProcess.kill();
   process.exit(0);
 });

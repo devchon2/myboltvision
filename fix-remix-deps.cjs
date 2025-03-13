@@ -9,11 +9,11 @@ const path = require('path');
 
 // Configuration pour les logs
 const styles = {
-  error: '\x1b[31m%s\x1b[0m',    // Rouge
-  success: '\x1b[32m%s\x1b[0m',  // Vert
-  warning: '\x1b[33m%s\x1b[0m',  // Jaune
-  info: '\x1b[36m%s\x1b[0m',     // Cyan
-  title: '\x1b[1m\x1b[35m%s\x1b[0m' // Magenta gras
+  error: '\x1b[31m%s\x1b[0m', // Rouge
+  success: '\x1b[32m%s\x1b[0m', // Vert
+  warning: '\x1b[33m%s\x1b[0m', // Jaune
+  info: '\x1b[36m%s\x1b[0m', // Cyan
+  title: '\x1b[1m\x1b[35m%s\x1b[0m', // Magenta gras
 };
 
 console.log(styles.title, '\n★═══════════════════════════════════════★');
@@ -50,7 +50,7 @@ try {
   execSync('taskkill /F /IM node.exe /T', { stdio: 'ignore' });
   console.log(styles.success, '   ✓ Processus node arrêtés');
 } catch (error) {
-  console.log(styles.warning, '   ⚠️ Aucun processus node à arrêter ou erreur lors de l\'arrêt');
+  console.log(styles.warning, "   ⚠️ Aucun processus node à arrêter ou erreur lors de l'arrêt");
 }
 
 // Étape 3: Nettoyer le cache npm
@@ -72,7 +72,7 @@ const remixCaches = [
   path.join(process.env.APPDATA || '', 'npm-cache'),
   path.join(process.env.LOCALAPPDATA || '', '.remix'),
   path.join(process.env.LOCALAPPDATA || '', 'remix'),
-  '.cache'
+  '.cache',
 ];
 
 for (const cacheDir of remixCaches) {
@@ -94,43 +94,38 @@ execSafe('npm install');
 console.log(styles.info, '7. Vérification des versions de Remix dans package.json...');
 try {
   const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-  const remixPackages = [
-    '@remix-run/react',
-    '@remix-run/dev',
-    '@remix-run/server-runtime',
-    '@remix-run/cloudflare'
-  ];
-  
+  const remixPackages = ['@remix-run/react', '@remix-run/dev', '@remix-run/server-runtime', '@remix-run/cloudflare'];
+
   let modified = false;
-  
+
   // Vérifier si toutes les dépendances Remix sont fixées à la même version
   for (const pkg of remixPackages) {
     if (packageJson.dependencies && packageJson.dependencies[pkg]) {
-      packageJson.dependencies[pkg] = "2.16.0";
+      packageJson.dependencies[pkg] = '2.16.0';
       modified = true;
       console.log(`   ✓ Version fixée pour ${pkg} en dépendance: 2.16.0`);
     }
-    
+
     if (packageJson.devDependencies && packageJson.devDependencies[pkg]) {
-      packageJson.devDependencies[pkg] = "2.16.0";
+      packageJson.devDependencies[pkg] = '2.16.0';
       modified = true;
       console.log(`   ✓ Version fixée pour ${pkg} en devDependency: 2.16.0`);
     }
   }
-  
+
   // Ajouter une section resolutions si elle n'existe pas
   if (!packageJson.resolutions) {
     packageJson.resolutions = {};
     modified = true;
   }
-  
+
   // Fixer les versions dans resolutions
   for (const pkg of remixPackages) {
-    packageJson.resolutions[pkg] = "2.16.0";
+    packageJson.resolutions[pkg] = '2.16.0';
     modified = true;
     console.log(`   ✓ Version fixée pour ${pkg} en resolution: 2.16.0`);
   }
-  
+
   if (modified) {
     fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2));
     console.log(styles.success, '   ✓ package.json mis à jour avec des versions fixes');
@@ -154,7 +149,7 @@ console.log(styles.title, '\n★════════════════
 console.log(styles.title, '      RÉPARATION COMPLÈTE TERMINÉE      ');
 console.log(styles.title, '★═══════════════════════════════════════★\n');
 
-console.log(styles.info, 'Pour démarrer l\'application, utilisez l\'une des commandes suivantes:');
+console.log(styles.info, "Pour démarrer l'application, utilisez l'une des commandes suivantes:");
 console.log('1. node launch.cjs          # Méthode recommandée avec polyfills');
 console.log('2. npm run dev              # Méthode standard');
 console.log('\nSi des erreurs persistent, exécutez:');

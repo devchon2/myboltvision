@@ -4,11 +4,14 @@
     "module": "ES2022",
     "moduleResolution": "node16",
     "outDir": "./dist/test",
-    "types": ["vitest", "node"]
+    "types": ["vitest", "node", "@testing-library/jest-dom"]
   },
   "include": [
     "**/*.test.ts",
+    "**/*.test.tsx",
     "**/__tests__/**/*.ts",
-    "**/__mocks__/**/*.ts"
+    "**/__tests__/**/*.tsx",
+    "**/__mocks__/**/*.ts",
+    "test/types/**/*.d.ts"
   ]
 }

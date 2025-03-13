@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file://D%3A/IA/Applications%20IA/myboltvision/app/page.tsx"],"sourcesContent":["// app/page.tsx\n'use client';\nimport React from 'react';\n\nconst HomePage = () => {\n  return (\n    <div>\n      <h1>Home</h1>\n      {/* Add home component here */}\n    </div>\n  );\n};\n\nexport default HomePage;\n"],"names":[],"mappings":"AAAA,eAAe;;;;;AACf;;AAGA,MAAM,WAAW;IACf,qBACE,4SAAC;kBACC,cAAA,4SAAC;sBAAG;;;;;;;;;;;AAIV;KAPM;uCASS","debugId":null}}]
+}

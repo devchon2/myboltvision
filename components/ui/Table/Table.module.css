@@ -1,0 +1,107 @@
+@charset "UTF-8";
+.tableContainer {
+  width: 100%;
+  overflow-x: auto; /* Pour la scrollbar horizontale si nécessaire */
+  font-family: var(--font-sans);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  text-align: left;
+}
+
+.headerCell {
+  background-color: var(--table-header-bg, #edf2f7);
+  color: var(--table-header-text, var(--text-primary));
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid var(--border-color, #e2e8f0);
+}
+.headerCell:hover {
+  cursor: pointer;
+  background-color: var(--table-header-hover-bg, #e2e8f0);
+}
+.headerCell[aria-sort='ascending']::after {
+  content: ' ▲';
+}
+.headerCell[aria-sort='descending']::after {
+  content: ' ▼';
+}
+
+.row:nth-child(even) {
+  background-color: var(--table-row-even-bg, #f7fafc);
+}
+.row:hover {
+  background-color: var(--table-row-hover-bg, #edf2f7);
+}
+
+.cell {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  color: var(--text-secondary);
+}
+.cell:first-child {
+  padding-left: 1rem;
+}
+.cell:last-child {
+  padding-right: 1rem;
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-top: 1px solid var(--border-color, #e2e8f0);
+}
+
+.pageSizeSelector {
+  display: flex;
+  align-items: center;
+}
+.pageSizeSelector label {
+  margin-right: 0.5rem;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+}
+.pageSizeSelector select {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--border-color, #e2e8f0);
+  font-size: 0.875rem;
+  background-color: white;
+  color: var(--text-primary);
+}
+.pageSizeSelector select:focus {
+  outline: none;
+  border-color: var(--primary-color, #3182ce);
+  box-shadow: 0 0 0 1px var(--primary-color, #3182ce);
+}
+
+.pageButtons button {
+  padding: 0.5rem 0.75rem;
+  margin: 0 0.25rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--border-color, #e2e8f0);
+  background-color: white;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+}
+.pageButtons button:hover:enabled {
+  background-color: var(--hover-bg, #f7fafc);
+}
+.pageButtons button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary-color, #3182ce);
+}
+.pageButtons button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.pageButtons span {
+  margin: 0 0.5rem;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+} /*# sourceMappingURL=Table.module.css.map */

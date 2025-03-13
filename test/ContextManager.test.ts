@@ -1,153 +1,81 @@
-import { ContextManager } from '../app/lib/core/ContextManager';
-import { VectorDB } from '../app/lib/core/VectorDB';
-import type { ContextCluster } from '../app/types/context';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-
-vi.mock('../app/lib/core/VectorDB', () => {
-  return {
-    VectorDB: vi.fn().mockImplementation(() => ({
-      init: vi.fn().mockResolvedValue(undefined),
-      upsertVector: vi.fn().mockResolvedValue(undefined),
-      findRelevant: vi.fn().mockResolvedValue([]),
-      deleteVector: vi.fn().mockResolvedValue(undefined),
-      updateVectors: vi.fn().mockResolvedValue(undefined),
-    })),
-  };
-});
+import { describe, it, expect, beforeEach } from 'vitest';
+import { ContextManager } from '../lib/core/ContextManager.js';
+import type { ContextCluster } from '../types/types/context.js';
 
 describe('ContextManager', () => {
-  let contextManager: ContextManager;
-  let vectorDBMock: any;
+  let manager: ContextManager;
 
   beforeEach(() => {
-    vi.clearAllMocks();
-    vectorDBMock = new VectorDB() as any; // Utilisez l'instance mockée de VectorDB
-    contextManager = new ContextManager();
-    contextManager['contextVectorDB'] = vectorDBMock;
+    manager = new ContextManager();
   });
 
-  it('should initialize the vector database', async () => {
-    await contextManager.init();
-    expect(vectorDBMock.init).toHaveBeenCalled();
-  }, 10000);
+  it('should initialize with empty cache', () => {
+    const cache = manager.liveContextCache.get();
+    expect(cache).toEqual({});
+  });
 
-  it('should upsert context', async () => {
-    const id = '1';
-    const vector = [0, 0, 0, 0, 0];
-    const metadata: ContextCluster = {
-      id: 'cluster1',
-      type: 'type1',
-      primaryShard: {
-        id: 'shard1',
-        type: 'type1',
-        data: 'data1',
-        content: 'content1',
-        timestamp: 'timestamp1',
-        metadata: { createdAt: new Date(), updatedAt: new Date(), version: '1.0' },
-        complexityMetric: 0.5,
-        innovationPotential: 0.8,
-        relatedClusters: []
-      },
-      shards: [],
-      vectors: [{
-        embedding: [0.1, 0.2, 0.3],
-        metadata: {},
-        content: 'Test vector content'
-      }],
-      data: {},
-      content: 'cluster content',
-      relatedClusters: [],
-      timestamp: Date.now(),
-      complexityMetric: 0.5,
-      innovationPotential: 0.8,
-      metadata: { createdAt: new Date(), updatedAt: new Date(), version: '1.0' }
-    };
+  it('should enrich context with basic input', async () => {
+    const input = 'Test context';
+    const result = await manager.enrichContext(input);
 
-    await contextManager.upsertContext(id, vector, metadata);
-    expect(vectorDBMock.upsertVector).toHaveBeenCalledWith(id, vector, metadata);
-  }, 10000);
+    expect(result).toHaveProperty('id');
+    expect(result.content).toBe(input);
+    expect(result.primaryShard.content).toBe(input);
+    expect(result.complexityMetric).toBeGreaterThan(0);
+    expect(result.innovationPotential).toBeGreaterThan(0);
+  });
 
-  it('should find relevant context', async () => {
-    const vector = [0, 0, 0, 0, 0];
-    const topK = 5;
-    const mockContexts: ContextCluster[] = [{
-      id: 'cluster1',
-      type: 'type1',
-      primaryShard: {
-        id: 'shard1',
-        type: 'type1',
-        data: 'data1',
-        content: 'content1',
-        timestamp: 'timestamp1',
-        metadata: { createdAt: new Date(), updatedAt: new Date(), version: '1.0' },
-        complexityMetric: 0.5,
-        innovationPotential: 0.8,
-        relatedClusters: []
-      },
-      shards: [],
-      vectors: [{
-        embedding: [0.1, 0.2, 0.3],
-        metadata: {},
-        content: 'Test vector content'
-      }],
-      data: {},
-      content: 'cluster content',
-      relatedClusters: [],
-      timestamp: Date.now(),
-      complexityMetric: 0.5,
-      innovationPotential: 0.8,
-      metadata: { createdAt: new Date(), updatedAt: new Date(), version: '1.0' }
-    }];
+  it('should cache enriched context', async () => {
+    const input = 'Test caching';
+    await manager.enrichContext(input);
 
-    vectorDBMock.findRelevant.mockResolvedValue(mockContexts);
+    const cached = manager.checkLiveCache(input);
+    expect(cached).toBeDefined();
+    expect(cached?.content).toBe(input);
+  });
 
-    const result = await contextManager.findRelevantContext(vector, topK);
-    expect(vectorDBMock.findRelevant).toHaveBeenCalledWith(vector, topK);
-    expect(result).toEqual(mockContexts);
-  }, 10000);
+  it('should purge stale cache entries', async () => {
+    // Add multiple entries with different timestamps
+    const now = Date.now();
+    const oldContext = {
+      id: 'old-ctx',
+      content: 'Old context',
+      timestamp: now - 7200000, // 2 hours old
+      metadata: { createdAt: new Date(), updatedAt: new Date() },
+    } as ContextCluster;
 
-  it('should delete context', async () => {
-    const id = '1';
+    manager.liveContextCache.set({ [oldContext.id]: oldContext });
 
-    await contextManager.deleteContext(id);
-    expect(vectorDBMock.deleteVector).toHaveBeenCalledWith(id);
-  }, 10000);
+    // Add a recent context
+    const recentContext = await manager.enrichContext('Recent context');
 
-  it('should update contexts', async () => {
-    const results = [{
-      id: '1',
-      vector: [0, 0, 0, 0, 0],
-      metadata: {
-        id: 'cluster1',
-        type: 'type1',
-        primaryShard: {
-          id: 'shard1',
-          type: 'type1',
-          data: 'data1',
-          content: 'content1',
-          timestamp: 'timestamp1',
-          metadata: { createdAt: new Date(), updatedAt: new Date(), version: '1.0' },
-          complexityMetric: 0.5,
-          innovationPotential: 0.8,
-          relatedClusters: []
-        },
-        shards: [],
-        vectors: [{
-          embedding: [0.1, 0.2, 0.3],
-          metadata: {},
-          content: 'Test vector content'
-        }],
-        data: {},
-        content: 'cluster content',
-        relatedClusters: [],
-        timestamp: Date.now(),
-        complexityMetric: 0.5,
-        innovationPotential: 0.8,
-        metadata: { createdAt: new Date(), updatedAt: new Date(), version: '1.0' }
-      }
-    }];
+    // Purge stale entries
+    manager.purgeStaleCacheEntries();
 
-    await contextManager.updateContexts(results);
-    expect(vectorDBMock.updateVectors).toHaveBeenCalledWith(results);
-  }, 10000);
+    const cache = manager.liveContextCache.get();
+    expect(cache[oldContext.id]).toBeUndefined();
+    expect(cache[recentContext.id]).toBeDefined();
+  });
+
+  it('should calculate context complexity', () => {
+    const simpleText = 'Simple text';
+    const complexText = 'This is a more complex text with technical terms like AI and blockchain';
+
+    const simpleScore = manager.calculateComplexity(simpleText);
+    const complexScore = manager.calculateComplexity(complexText);
+
+    expect(simpleScore).toBeGreaterThan(0);
+    expect(complexScore).toBeGreaterThan(simpleScore);
+  });
+
+  it('should assess innovation potential', () => {
+    const basicText = 'Basic text without innovation';
+    const innovativeText = 'This text discusses AI, blockchain and other emerging technologies';
+
+    const basicScore = manager.assessInnovation(basicText);
+    const innovativeScore = manager.assessInnovation(innovativeText);
+
+    expect(basicScore).toBeGreaterThan(0);
+    expect(innovativeScore).toBeGreaterThan(basicScore);
+  });
 });

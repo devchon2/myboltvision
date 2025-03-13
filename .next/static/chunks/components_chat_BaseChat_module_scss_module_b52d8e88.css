@@ -1,0 +1,80 @@
+/* [project]/components/chat/BaseChat.module.scss.module.css [app-client] (css) */
+.BaseChat-module-scss-module__X9bFMa__BaseChat {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.BaseChat-module-scss-module__X9bFMa__Chat {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: var(--chat-min-width, 400px);
+  height: 100%;
+}
+
+.BaseChat-module-scss-module__X9bFMa__PromptEffectContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.BaseChat-module-scss-module__X9bFMa__PromptEffectLine {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: url('#line-gradient');
+  stroke-width: 1.5px;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100px;
+  animation: 3s ease-in-out infinite BaseChat-module-scss-module__X9bFMa__promptLineAnimation;
+}
+
+.BaseChat-module-scss-module__X9bFMa__PromptShine {
+  position: absolute;
+  fill: url('#shine-gradient');
+  animation: 3s ease-in-out infinite BaseChat-module-scss-module__X9bFMa__promptShineAnimation;
+}
+
+@keyframes BaseChat-module-scss-module__X9bFMa__promptLineAnimation {
+  0% {
+    stroke-dashoffset: 100px;
+  }
+
+  50% {
+    stroke-dashoffset: 0;
+  }
+
+  100% {
+    stroke-dashoffset: -100px;
+  }
+}
+
+@keyframes BaseChat-module-scss-module__X9bFMa__promptShineAnimation {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+
+  25% {
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+/*# sourceMappingURL=components_chat_BaseChat_module_scss_module_b52d8e88.css.map*/

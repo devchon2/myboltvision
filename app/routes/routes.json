@@ -18,21 +18,21 @@
     {
       "id": "routes/api.chat",
       "path": "/api/chat",
-      "file": "app/routes/api.chat.ts", 
+      "file": "app/routes/api.chat.ts",
       "hasLoader": true,
       "hasAction": true
     },
     {
       "id": "routes/api.enhancer",
       "path": "/api/enhancer",
-      "file": "app/routes/api.enhancer.ts", 
+      "file": "app/routes/api.enhancer.ts",
       "hasLoader": true,
       "hasAction": true
     },
     {
       "id": "routes/api.llmcall",
       "path": "/api/llmcall",
-      "file": "app/routes/api.llmcall.ts", 
+      "file": "app/routes/api.llmcall.ts",
       "hasLoader": true,
       "hasAction": true
     }

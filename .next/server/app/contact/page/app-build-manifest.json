@@ -1,0 +1,19 @@
+{
+  "pages": {
+    "/contact/page": [
+      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_f260f7fc._.js",
+      "static/chunks/1c5ac_next_dist_3e978d26._.js",
+      "static/chunks/components_auth_AuthContext_tsx_8e60729c._.js",
+      "static/chunks/app_layout_tsx_a4c3f080._.js",
+      "static/chunks/app_error_tsx_1c4448c8._.js",
+      "static/chunks/app_error_tsx_7a454430._.js",
+      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_d1e1793d._.js",
+      "static/chunks/1c5ac_next_dist_compiled_0cc85728._.js",
+      "static/chunks/1c5ac_next_dist_client_b1436256._.js",
+      "static/chunks/1c5ac_next_dist_709fa073._.js",
+      "static/chunks/61dca_@swc_helpers_cjs_e27e0aca._.js",
+      "static/chunks/_e69f0d32._.js",
+      "static/chunks/_93a9381f._.js"
+    ]
+  }
+}

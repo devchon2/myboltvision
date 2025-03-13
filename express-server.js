@@ -36,8 +36,8 @@ app.all(
   '*',
   createRequestHandler({
     build: path.resolve(__dirname, 'build'),
-    mode: process.env.NODE_ENV
-  })
+    mode: process.env.NODE_ENV,
+  }),
 );
 
 // Démarrer le serveur

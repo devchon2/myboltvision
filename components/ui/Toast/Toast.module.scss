@@ -1,0 +1,217 @@
+@import '../styles/variables.scss';
+@import '../styles/mixins.scss';
+
+// Conteneur pour les toasts
+.container {
+  position: fixed;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  max-width: 400px;
+  width: 100%;
+  pointer-events: none; // Pour ne pas bloquer les clics
+  padding: var(--spacing-4);
+
+  // Positionnement
+  &--top-left {
+    top: 0;
+    left: 0;
+  }
+
+  &--top-right {
+    top: 0;
+    right: 0;
+  }
+
+  &--bottom-left {
+    bottom: 0;
+    left: 0;
+  }
+
+  &--bottom-right {
+    bottom: 0;
+    right: 0;
+  }
+}
+
+// Toast individuel
+.toast {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  padding: var(--spacing-3);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--spacing-2);
+  pointer-events: auto; // Override du conteneur
+  overflow: hidden;
+  animation: slideIn 0.3s var(--transition-easing-ease-out);
+  cursor: pointer;
+  position: relative;
+
+  // Types de toast
+  &--info {
+    background-color: var(--color-info-light);
+    border-left: 4px solid var(--color-info-main);
+    color: var(--color-text-primary);
+  }
+
+  &--success {
+    background-color: var(--color-success-light);
+    border-left: 4px solid var(--color-success-main);
+    color: var(--color-text-primary);
+  }
+
+  &--warning {
+    background-color: var(--color-warning-light);
+    border-left: 4px solid var(--color-warning-main);
+    color: var(--color-text-primary);
+  }
+
+  &--error {
+    background-color: var(--color-error-light);
+    border-left: 4px solid var(--color-error-main);
+    color: var(--color-text-primary);
+  }
+
+  // État de hover
+  &:hover {
+    filter: brightness(0.95);
+  }
+}
+
+// Icône
+.icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-right: var(--spacing-2);
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  &--info {
+    color: var(--color-info-main);
+  }
+
+  &--success {
+    color: var(--color-success-main);
+  }
+
+  &--warning {
+    color: var(--color-warning-main);
+  }
+
+  &--error {
+    color: var(--color-error-main);
+  }
+}
+
+// Contenu
+.content {
+  flex: 1;
+  max-width: calc(100% - 56px); // Pour tenir compte de l'icône et du bouton de fermeture
+}
+
+.title {
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-md);
+  margin-bottom: var(--spacing-1);
+}
+
+.message {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  @include truncate(3); // Limite à 3 lignes avec ellipsis
+}
+
+// Bouton de fermeture
+.closeButton {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-full);
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: 0;
+  position: absolute;
+  top: var(--spacing-1);
+  right: var(--spacing-1);
+  opacity: 0.7;
+  transition: all 0.2s ease;
+
+  &:hover {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 1px;
+  }
+}
+
+.closeIcon {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+// Animation d'entrée
+@keyframes slideIn {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+// Animation pour les toasts du côté gauche
+.container--top-left .toast,
+.container--bottom-left .toast {
+  animation-name: slideInLeft;
+}
+
+@keyframes slideInLeft {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+// Responsive
+@include responsive-down(sm) {
+  .container {
+    max-width: 100%;
+    padding: var(--spacing-2);
+  }
+
+  .toast {
+    padding: var(--spacing-2);
+  }
+
+  .title {
+    font-size: var(--font-size-sm);
+  }
+
+  .message {
+    font-size: var(--font-size-xs);
+  }
+}

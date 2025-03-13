@@ -1,7 +1,7 @@
 /**
  * Solution robuste pour résoudre les problèmes de Remix
  * sans supprimer les modules existants
- * 
+ *
  * Ce script corrige la configuration de l'application
  * et effectue des patches ciblés pour éviter les erreurs
  * de "handleDocumentRequestFunction is not a function"
@@ -13,11 +13,11 @@ const path = require('path');
 
 // Configuration pour les logs
 const styles = {
-  error: '\x1b[31m%s\x1b[0m',    // Rouge
-  success: '\x1b[32m%s\x1b[0m',  // Vert
-  warning: '\x1b[33m%s\x1b[0m',  // Jaune
-  info: '\x1b[36m%s\x1b[0m',     // Cyan
-  title: '\x1b[1m\x1b[35m%s\x1b[0m' // Magenta gras
+  error: '\x1b[31m%s\x1b[0m', // Rouge
+  success: '\x1b[32m%s\x1b[0m', // Vert
+  warning: '\x1b[33m%s\x1b[0m', // Jaune
+  info: '\x1b[36m%s\x1b[0m', // Cyan
+  title: '\x1b[1m\x1b[35m%s\x1b[0m', // Magenta gras
 };
 
 // Afficher l'en-tête
@@ -40,27 +40,27 @@ const execCommand = (cmd, options = {}) => {
 // 1. Vérifier les scripts de démarrage et les mettre à jour
 const updateScripts = () => {
   console.log(styles.info, '1️⃣ Mise à jour des scripts de démarrage...');
-  
+
   try {
     const packageJsonPath = path.join(__dirname, 'package.json');
     const packageJson = require(packageJsonPath);
-    
+
     let modified = false;
-    
+
     // Ajouter un script de démarrage sécurisé
     if (!packageJson.scripts.devSafe) {
       packageJson.scripts.devSafe = 'node start-dev.cjs';
       modified = true;
       console.log('   ✓ Script "devSafe" ajouté');
     }
-    
+
     // Ajouter un script de préparation
     if (!packageJson.scripts.prepare) {
       packageJson.scripts.prepare = 'node pre-start.cjs && node module-polyfill.cjs';
       modified = true;
       console.log('   ✓ Script "prepare" ajouté');
     }
-    
+
     // Sauvegarder les modifications si nécessaire
     if (modified) {
       fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
@@ -68,7 +68,7 @@ const updateScripts = () => {
     } else {
       console.log('   ℹ Aucune modification nécessaire pour les scripts');
     }
-    
+
     return true;
   } catch (error) {
     console.log(styles.error, `   ❌ Erreur lors de la mise à jour des scripts: ${error.message}`);
@@ -79,7 +79,7 @@ const updateScripts = () => {
 // 2. Vérifier et créer le module-polyfill.js (pour le code client)
 const createClientPolyfill = () => {
   console.log(styles.info, '2️⃣ Création du polyfill pour le client...');
-  
+
   try {
     const polyfillPath = path.join(__dirname, 'remix-client-polyfill.js');
     const polyfillContent = `/**
@@ -117,7 +117,7 @@ export default {
   path: window.path
 };
 `;
-    
+
     // Écrire le fichier s'il n'existe pas
     if (!fs.existsSync(polyfillPath)) {
       fs.writeFileSync(polyfillPath, polyfillContent);
@@ -125,7 +125,7 @@ export default {
     } else {
       console.log('   ℹ Le fichier remix-client-polyfill.js existe déjà');
     }
-    
+
     return true;
   } catch (error) {
     console.log(styles.error, `   ❌ Erreur lors de la création du polyfill client: ${error.message}`);
@@ -135,8 +135,8 @@ export default {
 
 // 3. Créer un script de lancement direct
 const createDirectLaunchScript = () => {
-  console.log(styles.info, '3️⃣ Création d\'un script de lancement direct...');
-  
+  console.log(styles.info, "3️⃣ Création d'un script de lancement direct...");
+
   try {
     const launchPath = path.join(__dirname, 'launch.cjs');
     const launchContent = `/**
@@ -178,7 +178,7 @@ viteProcess.on('exit', (code) => {
   process.exit(code);
 });
 `;
-    
+
     // Écrire le fichier s'il n'existe pas
     if (!fs.existsSync(launchPath)) {
       fs.writeFileSync(launchPath, launchContent);
@@ -186,7 +186,7 @@ viteProcess.on('exit', (code) => {
     } else {
       console.log('   ℹ Le fichier launch.cjs existe déjà');
     }
-    
+
     return true;
   } catch (error) {
     console.log(styles.error, `   ❌ Erreur lors de la création du script de lancement: ${error.message}`);
@@ -197,20 +197,20 @@ viteProcess.on('exit', (code) => {
 // 4. Modifier vite.config.ts pour ajouter un plugin de correction
 const updateViteConfig = () => {
   console.log(styles.info, '4️⃣ Mise à jour de la configuration Vite...');
-  
+
   try {
     const viteConfigPath = path.join(__dirname, 'vite.config.ts');
     let viteConfig = fs.readFileSync(viteConfigPath, 'utf8');
-    
+
     // Vérifier si notre plugin de correction est déjà présent
     if (!viteConfig.includes('handleDocumentRequestPatchPlugin')) {
       // Chercher la section plugins
       const pluginsIndex = viteConfig.indexOf('plugins: [');
-      
+
       if (pluginsIndex !== -1) {
         // Déterminer l'indentation
         const indent = '  '; // Indentation par défaut
-        
+
         // Plugin de correction pour handleDocumentRequest
         const patchPlugin = `
   // Patch pour handleDocumentRequestFunction
@@ -258,10 +258,10 @@ const updateViteConfig = () => {
       return null;
     }
   },`;
-        
+
         // Insérer notre plugin au début de la liste des plugins
         viteConfig = viteConfig.slice(0, pluginsIndex + 10) + patchPlugin + viteConfig.slice(pluginsIndex + 10);
-        
+
         // Sauvegarder le fichier modifié
         fs.writeFileSync(viteConfigPath, viteConfig);
         console.log(styles.success, '   ✓ Plugin de correction ajouté à vite.config.ts');
@@ -271,7 +271,7 @@ const updateViteConfig = () => {
     } else {
       console.log('   ℹ Le plugin de correction est déjà présent dans vite.config.ts');
     }
-    
+
     return true;
   } catch (error) {
     console.log(styles.error, `   ❌ Erreur lors de la mise à jour de vite.config.ts: ${error.message}`);
@@ -284,7 +284,7 @@ const results = {
   updateScripts: updateScripts(),
   createClientPolyfill: createClientPolyfill(),
   createDirectLaunchScript: createDirectLaunchScript(),
-  updateViteConfig: updateViteConfig()
+  updateViteConfig: updateViteConfig(),
 };
 
 // Afficher le résumé
@@ -298,11 +298,11 @@ for (const [step, success] of Object.entries(results)) {
 
 // Instructions finales
 console.log(styles.title, '\n★═════════════ PROCHAINES ÉTAPES ═════════════★');
-console.log(styles.info, '1. Démarrez l\'application avec l\'une des commandes suivantes:');
+console.log(styles.info, "1. Démarrez l'application avec l'une des commandes suivantes:");
 console.log('   • node launch.cjs (méthode recommandée)');
 console.log('   • npm run devSafe');
 console.log(styles.info, '2. Si des erreurs persistent, essayez de lancer:');
 console.log('   • node debug-loader.cjs');
 console.log(styles.info, '3. Si le problème persiste, utilisez une approche alternative:');
-console.log('   • Remplacez vos versions de @remix-run par celles d\'une version antérieure');
-console.log('   • Essayez d\'utiliser pnpm au lieu de npm pour gérer les dépendances');
+console.log("   • Remplacez vos versions de @remix-run par celles d'une version antérieure");
+console.log("   • Essayez d'utiliser pnpm au lieu de npm pour gérer les dépendances");

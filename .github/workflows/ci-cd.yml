@@ -1,0 +1,71 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  # IMPORTANT : Configurez ces secrets dans les paramètres de votre dépôt GitHub
+  # Valeurs par défaut temporaires - À REMPLACER IMPÉRATIVEMENT
+  API_URL: ${{ secrets.API_URL || 'https://api.example.com' }}
+  AUTH_SECRET: ${{ secrets.AUTH_SECRET || 'default-secret-key' }}
+  APP_URL: ${{ secrets.APP_URL || 'https://myboltvision.app' }}
+  MONITORING_API: ${{ secrets.MONITORING_API || 'https://monitoring.example.com' }}
+  MONITORING_TOKEN: ${{ secrets.MONITORING_TOKEN || 'default-monitoring-token' }}
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || '' }}
+  SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK || '' }}
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Utiliser Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+
+      - name: Installer pnpm
+        run: npm install -g pnpm
+
+      - name: Installer les dépendances
+        run: pnpm install
+
+      - name: Linter
+        run: pnpm run lint
+
+      - name: Tests
+        run: pnpm run test
+
+      - name: Build
+        run: pnpm run build
+        env:
+          # Variables spécifiques au build
+          NODE_ENV: production
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Déployer sur Vercel
+        run: npx vercel deploy --prod
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: Notification Slack
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: "Déploiement de MyBoltVision terminé\nStatut: ${{ job.status }}\nRépositoire: ${{ github.repository }}\nCommit: ${{ github.sha }}"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+        if: always()

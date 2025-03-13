@@ -8,7 +8,7 @@ import '@testing-library/jest-dom';
 
 // Mocquer le composant Workbench pour qu'il retourne un texte "Workbench"
 vi.mock('../app/components/workbench/Workbench', () => ({
-  Workbench: () => <div>Workbench</div>
+  Workbench: () => <div>Workbench</div>,
 }));
 
 describe('Dashboard', () => {

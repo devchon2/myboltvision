@@ -1,0 +1,200 @@
+@import '../ui/styles/variables.scss';
+@import '../ui/styles/mixins.scss';
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 var(--spacing-4);
+  background-color: var(--color-background-default);
+  border-bottom: 1px solid var(--color-neutral-200);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+
+  @include transition(box-shadow);
+
+  // Ajouter une ombre lorsque l'en-tête est collé en haut de l'écran
+  &--scrolled {
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+}
+
+.menuButton {
+  margin-right: var(--spacing-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--border-radius-md);
+  color: var(--color-text-secondary);
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: var(--color-neutral-100);
+    color: var(--color-text-primary);
+  }
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+
+  .logoImage {
+    height: 32px;
+    width: 32px;
+  }
+
+  .title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin: 0;
+
+    @include responsive-down(sm) {
+      font-size: var(--font-size-md);
+    }
+  }
+}
+
+.versionBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--spacing-2);
+  height: 20px;
+  margin-left: var(--spacing-2);
+  background-color: var(--color-primary-100);
+  color: var(--color-primary-700);
+  border-radius: 999px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.modelSelector {
+  height: 36px;
+  padding: 0 var(--spacing-3);
+  border: 1px solid var(--color-neutral-300);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  background-color: var(--color-background-default);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--color-primary-500);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 2px var(--color-primary-100);
+  }
+
+  @include responsive-down(sm) {
+    display: none;
+  }
+}
+
+.actionButtons {
+  display: flex;
+  align-items: center;
+}
+
+.iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--border-radius-md);
+  color: var(--color-text-secondary);
+  transition: all 0.2s ease;
+  margin-left: var(--spacing-1);
+
+  &:hover {
+    background-color: var(--color-neutral-100);
+    color: var(--color-text-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.dropdownContent {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: var(--spacing-1);
+  min-width: 200px;
+  background-color: var(--color-background-default);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-md);
+  z-index: 50;
+  overflow: hidden;
+  animation: fadeInDown 0.2s ease-out;
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-2) var(--spacing-3);
+  color: var(--color-text-primary);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: var(--color-neutral-100);
+  }
+
+  svg {
+    margin-right: var(--spacing-2);
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.dropdownDivider {
+  height: 1px;
+  background-color: var(--color-neutral-200);
+  margin: var(--spacing-1) 0;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -149,7 +149,7 @@ const server = http.createServer((req, res) => {
   } else if (req.url === '/favicon.svg' || req.url === '/logo.svg') {
     // Servir les icônes
     const iconPath = path.join(__dirname, 'public', req.url);
-    
+
     try {
       const data = fs.readFileSync(iconPath);
       res.writeHead(200, { 'Content-Type': 'image/svg+xml' });

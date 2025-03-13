@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file://D%3A/IA/Applications%20IA/myboltvision/app/error.tsx"],"sourcesContent":["'use client';\n\nimport { useEffect } from 'react';\n\nexport default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {\n  useEffect(() => {\n    // Optionally log the error to an error reporting service\n    console.error(error);\n  }, [error]);\n\n  return (\n    <div>\n      <h2>Something went wrong!</h2>\n      <button onClick={() => reset()}>Try again</button>\n    </div>\n  );\n}\n"],"names":[],"mappings":";;;;AAEA;;;AAFA;;AAIe,SAAS,MAAM,EAAE,KAAK,EAAE,KAAK,EAA6D;;IACvG,CAAA,GAAA,4QAAA,CAAA,YAAS,AAAD;2BAAE;YACR,yDAAyD;YACzD,QAAQ,KAAK,CAAC;QAChB;0BAAG;QAAC;KAAM;IAEV,qBACE,4SAAC;;0BACC,4SAAC;0BAAG;;;;;;0BACJ,4SAAC;gBAAO,SAAS,IAAM;0BAAS;;;;;;;;;;;;AAGtC;GAZwB;KAAA","debugId":null}}]
+}

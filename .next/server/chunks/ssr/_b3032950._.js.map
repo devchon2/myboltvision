@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
+    {"offset": {"line": 26, "column": 0}, "map": {"version":3,"sources":["file://D%3A/IA/Applications%20IA/myboltvision/app/chat/page.tsx"],"sourcesContent":["import { redirect } from 'next/navigation';\r\n\r\nexport default function ChatPage() {\r\n  // Générer un nouvel identifiant unique pour chaque visite\r\n  const uniqueId = Math.random().toString(36).substring(2, 12);\r\n  redirect(`/chat/${uniqueId}`);\r\n}\r\n"],"names":[],"mappings":";;;AAAA;AAAA;;AAEe,SAAS;IACtB,0DAA0D;IAC1D,MAAM,WAAW,KAAK,MAAM,GAAG,QAAQ,CAAC,IAAI,SAAS,CAAC,GAAG;IACzD,CAAA,GAAA,oSAAA,CAAA,WAAQ,AAAD,EAAE,CAAC,MAAM,EAAE,UAAU;AAC9B","debugId":null}}]
+}

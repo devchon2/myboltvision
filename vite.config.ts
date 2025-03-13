@@ -1,4 +1,3 @@
-import { vitePlugin as remixVitePlugin } from '@remix-run/dev';
 import { defineConfig, type ViteDevServer } from 'vite';
 import dotenv from 'dotenv';
 import { join } from 'path';
@@ -33,7 +32,7 @@ function remixManifestPlugin() {
         return manifestPath;
       }
       return null;
-    }
+    },
   };
 }
 
@@ -51,14 +50,14 @@ function chrome129IssuePlugin() {
           if (version === 129) {
             res.setHeader('content-type', 'text/html');
             res.end(
-              '<body><h1>Please use Chrome Canary for testing.</h1><p>Chrome 129 has an issue with JavaScript modules & Vite local development, see <a href="https://github.com/stackblitz/bolt.new/issues/86#issuecomment-2395519258">for more information.</a></p><p><b>Note:</b> This only impacts <u>local development</u>. `pnpm run build` and `pnpm run start` will work fine in this browser.</p></body>'
+              '<body><h1>Please use Chrome Canary for testing.</h1><p>Chrome 129 has an issue with JavaScript modules & Vite local development, see <a href="https://github.com/stackblitz/bolt.new/issues/86#issuecomment-2395519258">for more information.</a></p><p><b>Note:</b> This only impacts <u>local development</u>. `pnpm run build` and `pnpm run start` will work fine in this browser.</p></body>',
             );
             return;
           }
         }
         next();
       });
-    }
+    },
   };
 }
 
@@ -94,10 +93,10 @@ function modulePolyfillPlugin() {
               };
               console.log('✅ [Browser] window.path polyfill chargé');
             }
-          `
-        }
+          `,
+        },
       ];
-    }
+    },
   };
 }
 
@@ -113,7 +112,7 @@ function esmInteropPlugin() {
         return { id, external: true };
       }
       return null;
-    }
+    },
   };
 }
 
@@ -128,16 +127,31 @@ export default defineConfig({
         // Patcher uniquement le fichier server.js dans @remix-run/server-runtime
         if (id.includes('@remix-run/server-runtime') && id.endsWith('server.js')) {
           console.log('📄 Patching server.js dans @remix-run/server-runtime');
-          
+
           // Log le contenu pour diagnostiquer
           log('server-js-content.log', code);
-          
+
+          // S'assurer que les références requises sont disponibles
+          let modifiedCode = code;
+
+          // Ajouter les imports nécessaires s'ils n'existent pas déjà
+          if (!modifiedCode.includes('import { isRedirectResponse }')) {
+            modifiedCode = `import { isRedirectResponse } from '@remix-run/server-runtime/responses';\n${modifiedCode}`;
+          }
+
           // Corriger les appels problématiques avec un pattern plus générique
-          return code
-            .replace(
-              /async function handleDocumentRequest\([^\)]*\)\s*\{[^}]*\}/ms,
-              `async function handleDocumentRequest(serverMode, build, staticHandler, request, loadContext, handleError, criticalCss) {
+          return (
+            modifiedCode
+              .replace(
+                /async function handleDocumentRequest\([^\)]*\)\s*\{[^}]*\}/ms,
+                `async function handleDocumentRequest(serverMode, build, staticHandler, request, loadContext, handleError, criticalCss) {
                 try {
+                  const responses = { isRedirectResponse }; // Définir responses pour éviter les erreurs
+                  const createRemixRedirectResponse = (response, basename) => {
+                    // Implémentation simplifiée
+                    return response;
+                  };
+                  
                   let response = await staticHandler.queryRoute(request, {
                     requestContext: loadContext
                   });
@@ -154,6 +168,11 @@ export default defineConfig({
                   
                   let entryContext = { ...build.entryContext };
                   
+                  // Accéder à entry de façon sécurisée
+                  const entry = build.entry || build.entryContext?.entry || { 
+                    renderToHTML: async () => "<html><body>Fallback rendering</body></html>" 
+                  };
+                  
                   // Rendu simplifié
                   const markup = await entry.renderToHTML(request, entryContext, loadContext);
                   return new Response(markup, {
@@ -161,28 +180,31 @@ export default defineConfig({
                     headers: responseHeaders
                   });
                 } catch (error) {
+                  console.error("Error in handleDocumentRequest:", error);
                   handleError(error);
                   return returnLastResortErrorResponse(error, serverMode);
                 }
-              }`
-            )
-            .replace(
-              /export async function requestHandler\([^{]*{/,
-              `export async function requestHandler(request, loadContext = {}, routeId) {
-                try { // Patched error handling`
-            )
-            .replace(
-              /return handleDocumentRequest\([^}]*}/,
-              `return handleDocumentRequest(serverMode, _build, staticHandler, request, loadContext, handleError, criticalCss);
+              }`,
+              )
+              // Reste du code inchangé...
+              .replace(
+                /export async function requestHandler\([^{]*{/,
+                `export async function requestHandler(request, loadContext = {}, routeId) {
+                try { // Patched error handling`,
+              )
+              .replace(
+                /return handleDocumentRequest\([^}]*}/,
+                `return handleDocumentRequest(serverMode, _build, staticHandler, request, loadContext, handleError, criticalCss);
                 } catch (error) {
                   console.error("Remix runtime error:", error);
                   return new Response("Server Error", { status: 500 });
                 }
-              }`
-            );
+              }`,
+              )
+          );
         }
         return null;
-      }
+      },
     },
     UnoCSS(),
     nodePolyfills({
@@ -205,23 +227,10 @@ export default defineConfig({
             if (typeof self !== 'undefined' && !self.module) { self.module = { exports: {} }; }
           `;
         }
-      }
+      },
     },
     modulePolyfillPlugin(),
     remixManifestPlugin(),
-    remixVitePlugin({
-      future: {
-        v3_fetcherPersist: true,
-        v3_relativeSplatPath: true,
-        v3_throwAbortReason: true,
-        v3_lazyRouteDiscovery: true,
-        v3_singleFetch: true
-      },
-      manifest: true,
-      ssr: true,
-      appDirectory: "app",
-      ignoredRouteFiles: ["**/.*"]
-    }),
     tsconfigPaths(),
     chrome129IssuePlugin(),
     optimizeCssModules({ apply: 'build' }),
@@ -233,12 +242,10 @@ export default defineConfig({
   resolve: {
     alias: {
       path: 'path-browserify',
-      '@remix-run/server-runtime/dist/server': path.resolve(__dirname, 'server-runtime-shim.js'),
-      '@remix-run/server-runtime': path.resolve(__dirname, 'node_modules/@remix-run/server-runtime/dist/esm/index.js'),
     },
     conditions: ['import', 'module', 'browser', 'default'],
     extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'],
-    preserveSymlinks: true
+    preserveSymlinks: true,
   },
   build: {
     target: 'esnext',
@@ -255,11 +262,10 @@ export default defineConfig({
       'nanostores',
       '@codemirror/view',
       '@codemirror/state',
-      'remix-island'
     ],
     optimizeDeps: {
-      include: ['path-browserify']
-    }
+      include: ['path-browserify'],
+    },
   },
   css: {
     preprocessorOptions: {

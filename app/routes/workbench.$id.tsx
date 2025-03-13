@@ -1,18 +1,20 @@
-import { useParams } from '@remix-run/react';
-import { json, type LoaderFunctionArgs } from '@remix-run/cloudflare';
-import { IdeationWorkbench } from '../components/workbench/IdeationWorkbench';
+import type { GetServerSideProps } from 'next';
+import { useRouter } from 'next/router';
+import { IdeationWorkbench } from '../components/workbench/IdeationWorkbench.jsx';
 
-export async function loader({ params }: LoaderFunctionArgs) {
-  return json({ id: params.id });
-}
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { id } = context.params as { id: string };
+  return { props: { id } };
+};
 
-export default function WorkbenchRoute() {
-  const { id } = useParams();
-  
+export default function WorkbenchRoute({ id }: { id: string }) {
+  const router = useRouter();
+  const { id: queryId } = router.query as { id: string };
+
   return (
     <div className="workbench-container">
-      <IdeationWorkbench initialIdea="" />
-      
+      <IdeationWorkbench initialIdea={queryId} />
+
       <style jsx>{`
         .workbench-container {
           width: 100%;

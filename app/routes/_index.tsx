@@ -1,8 +1,11 @@
-import { json, type LoaderFunctionArgs } from "@remix-run/cloudflare";
+import type { GetServerSideProps } from 'next';
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  // Retourner au minimum un objet vide si vous n'avez pas besoin de données
-  return json({ status: "ok" });
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  return {
+    props: {
+      status: 'ok',
+    },
+  };
 };
 
 export default function Index() {

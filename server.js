@@ -12,10 +12,13 @@ const app = express();
 app.use(express.static('public'));
 
 // Gestionnaire Remix standard
-app.all('*', createRequestHandlerShim({
-  build: require('./build'),
-  mode: process.env.NODE_ENV
-}));
+app.all(
+  '*',
+  createRequestHandlerShim({
+    build: require('./build'),
+    mode: process.env.NODE_ENV,
+  }),
+);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

@@ -1,0 +1,165 @@
+// Mixins SCSS pour faciliter le développement des composants
+
+// Mixin pour les media queries responsive
+// Utilisation: @include responsive(md) { ... }
+@mixin responsive($breakpoint) {
+  @if $breakpoint == xs {
+    @media (min-width: $breakpoint-xs) {
+      @content;
+    }
+  } @else if $breakpoint == sm {
+    @media (min-width: $breakpoint-sm) {
+      @content;
+    }
+  } @else if $breakpoint == md {
+    @media (min-width: $breakpoint-md) {
+      @content;
+    }
+  } @else if $breakpoint == lg {
+    @media (min-width: $breakpoint-lg) {
+      @content;
+    }
+  } @else if $breakpoint == xl {
+    @media (min-width: $breakpoint-xl) {
+      @content;
+    }
+  }
+}
+
+// Mixin pour les media queries inversées (max-width)
+// Utilisation: @include responsive-down(md) { ... }
+@mixin responsive-down($breakpoint) {
+  @if $breakpoint == xs {
+    @media (max-width: ($breakpoint-sm - 1px)) {
+      @content;
+    }
+  } @else if $breakpoint == sm {
+    @media (max-width: ($breakpoint-md - 1px)) {
+      @content;
+    }
+  } @else if $breakpoint == md {
+    @media (max-width: ($breakpoint-lg - 1px)) {
+      @content;
+    }
+  } @else if $breakpoint == lg {
+    @media (max-width: ($breakpoint-xl - 1px)) {
+      @content;
+    }
+  } @else if $breakpoint == xl {
+    @media (max-width: 99999px) {
+      @content;
+    }
+  }
+}
+
+// Mixin pour les transitions fluides
+// Utilisation: @include transition(color, background-color)
+@mixin transition($properties...) {
+  $values: ();
+  @each $property in $properties {
+    $values: append($values, $property $transition-duration-standard $transition-easing-ease-in-out, comma);
+  }
+  transition: $values;
+}
+
+// Mixin pour flexbox avec direction, alignement et justification
+// Utilisation: @include flex(row, center, space-between)
+@mixin flex($direction: row, $align: center, $justify: flex-start, $wrap: nowrap) {
+  display: flex;
+  flex-direction: $direction;
+  align-items: $align;
+  justify-content: $justify;
+  flex-wrap: $wrap;
+}
+
+// Mixin pour les grilles
+// Utilisation: @include grid(3, 1rem)
+@mixin grid($columns: 1, $gap: $spacing-4, $rowGap: $gap) {
+  display: grid;
+  grid-template-columns: repeat($columns, 1fr);
+  gap: $rowGap $gap;
+}
+
+// Mixin pour le mode sombre
+// Utilisation: @include dark-mode { ... }
+@mixin dark-mode {
+  @media (prefers-color-scheme: dark) {
+    @content;
+  }
+}
+
+// Mixin pour les styles de texte tronqués
+// Utilisation: @include truncate(2)
+@mixin truncate($lines: 1) {
+  @if $lines == 1 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  } @else {
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+// Mixin pour les ombres avec intensité variable
+// Utilisation: @include box-shadow(md)
+@mixin box-shadow($size: md) {
+  @if $size == sm {
+    box-shadow: var(--shadow-sm);
+  } @else if $size == md {
+    box-shadow: var(--shadow-md);
+  } @else if $size == lg {
+    box-shadow: var(--shadow-lg);
+  } @else if $size == xl {
+    box-shadow: var(--shadow-xl);
+  } @else if $size == 2xl {
+    box-shadow: var(--shadow-2xl);
+  } @else {
+    box-shadow: none;
+  }
+}
+
+// Mixin pour accessibilité - contenu uniquement pour lecteurs d'écran
+// Utilisation: @include screen-reader-only
+@mixin screen-reader-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+// Mixin pour focus accessible
+// Utilisation: @include focus-outline
+@mixin focus-outline {
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
+  }
+}
+
+// Mixin pour créer une taille fixe avec aspect ratio
+// Utilisation: @include aspect-ratio(16, 9)
+@mixin aspect-ratio($width, $height) {
+  position: relative;
+
+  &::before {
+    content: '';
+    display: block;
+    padding-top: ($height / $width) * 100%;
+  }
+
+  > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}

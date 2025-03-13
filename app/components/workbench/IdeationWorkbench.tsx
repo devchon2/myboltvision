@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { runIdeationWorkflow } from '../../lib/examples/ideation-workflow';
 import type { ContextShard } from '../../types/context';
@@ -22,50 +24,50 @@ export const IdeationWorkbench: React.FC<WorkbenchProps> = ({ initialIdea = '' }
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [activeView, setActiveView] = useState<string>('idea');
   const [results, setResults] = useState<Record<string, any>>({});
-  
+
   const [workflowSteps, setWorkflowSteps] = useState<WorkflowStep[]>([
     {
       id: 'ideation',
       name: 'Idéation',
-      description: 'Génération et raffinement d\'idées',
+      description: "Génération et raffinement d'idées",
       isActive: true,
-      isCompleted: false
+      isCompleted: false,
     },
     {
       id: 'market',
       name: 'Analyse de marché',
       description: 'Étude de la concurrence et des opportunités',
       isActive: false,
-      isCompleted: false
+      isCompleted: false,
     },
     {
       id: 'documentation',
       name: 'Documentation',
       description: 'Création des documents de projet',
       isActive: false,
-      isCompleted: false
+      isCompleted: false,
     },
     {
       id: 'design',
       name: 'Design',
       description: 'Création de wireframes et maquettes',
       isActive: false,
-      isCompleted: false
+      isCompleted: false,
     },
     {
       id: 'development',
       name: 'Développement',
       description: 'Génération de code et architecture',
       isActive: false,
-      isCompleted: false
+      isCompleted: false,
     },
     {
       id: 'deployment',
       name: 'Déploiement',
       description: 'Préparation au déploiement',
       isActive: false,
-      isCompleted: false
-    }
+      isCompleted: false,
+    },
   ]);
 
   const handleIdeaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -73,37 +75,44 @@ export const IdeationWorkbench: React.FC<WorkbenchProps> = ({ initialIdea = '' }
   };
 
   const handleStartWorkflow = async () => {
-    if (!idea.trim()) return;
-    
+    if (!idea.trim()) {
+      return;
+    }
+
     setIsProcessing(true);
+
     try {
       // Simule un appel à l'orchestrateur d'agents
       const workflowResults = await runIdeationWorkflow(idea);
-      
+
       // Met à jour les résultats et marque l'étape comme complétée
-      setResults(prev => ({ ...prev, ideation: workflowResults }));
-      
-      setWorkflowSteps(steps => steps.map(step => 
-        step.id === 'ideation' 
-          ? { ...step, isCompleted: true } 
-          : step.id === 'market' 
-            ? { ...step, isActive: true }
-            : step
-      ));
-      
+      setResults((prev) => ({ ...prev, ideation: workflowResults }));
+
+      setWorkflowSteps((steps) =>
+        steps.map((step) =>
+          step.id === 'ideation'
+            ? { ...step, isCompleted: true }
+            : step.id === 'market'
+              ? { ...step, isActive: true }
+              : step,
+        ),
+      );
+
       setActiveView('results');
     } catch (error) {
-      console.error('Erreur lors de l\'exécution du workflow:', error);
+      console.error("Erreur lors de l'exécution du workflow:", error);
     } finally {
       setIsProcessing(false);
     }
   };
 
   const activateStep = (stepId: string) => {
-    setWorkflowSteps(steps => steps.map(step => ({
-      ...step,
-      isActive: step.id === stepId
-    })));
+    setWorkflowSteps((steps) =>
+      steps.map((step) => ({
+        ...step,
+        isActive: step.id === stepId,
+      })),
+    );
     setActiveView(stepId);
   };
 
@@ -121,16 +130,12 @@ export const IdeationWorkbench: React.FC<WorkbenchProps> = ({ initialIdea = '' }
               className="idea-textarea"
               disabled={isProcessing}
             />
-            <button 
-              onClick={handleStartWorkflow}
-              disabled={!idea.trim() || isProcessing}
-              className="start-button"
-            >
-              {isProcessing ? 'Traitement en cours...' : 'Démarrer le processus d\'idéation'}
+            <button onClick={handleStartWorkflow} disabled={!idea.trim() || isProcessing} className="start-button">
+              {isProcessing ? 'Traitement en cours...' : "Démarrer le processus d'idéation"}
             </button>
           </div>
         );
-        
+
       case 'results':
         return (
           <div className="results-view">
@@ -142,26 +147,28 @@ export const IdeationWorkbench: React.FC<WorkbenchProps> = ({ initialIdea = '' }
             )}
           </div>
         );
-        
+
       case 'market':
         return (
           <div className="market-analysis">
             <h2>Analyse de marché</h2>
-            <p>Cette section vous permettra d'analyser le marché, la concurrence et les opportunités pour votre projet.</p>
-            <button 
-              className="action-button"
-              onClick={() => console.log('Lancement de l\'analyse de marché')}
-            >
+            <p>
+              Cette section vous permettra d'analyser le marché, la concurrence et les opportunités pour votre projet.
+            </p>
+            <button className="action-button" onClick={() => console.log("Lancement de l'analyse de marché")}>
               Lancer l'analyse de marché
             </button>
           </div>
         );
-        
+
       case 'documentation':
         return (
           <div className="documentation">
             <h2>Génération de documentation</h2>
-            <p>Génération automatique de documents pour votre projet: business plan, cahier des charges, spécifications techniques...</p>
+            <p>
+              Génération automatique de documents pour votre projet: business plan, cahier des charges, spécifications
+              techniques...
+            </p>
             <div className="doc-selector">
               <label>
                 <input type="checkbox" value="business-plan" /> Business Plan
@@ -173,12 +180,10 @@ export const IdeationWorkbench: React.FC<WorkbenchProps> = ({ initialIdea = '' }
                 <input type="checkbox" value="technical" /> Documentation technique
               </label>
             </div>
-            <button className="action-button">
-              Générer les documents
-            </button>
+            <button className="action-button">Générer les documents</button>
           </div>
         );
-        
+
       case 'design':
         return (
           <div className="design-workspace">
@@ -194,7 +199,7 @@ export const IdeationWorkbench: React.FC<WorkbenchProps> = ({ initialIdea = '' }
             </div>
           </div>
         );
-        
+
       case 'development':
         return (
           <div className="development">
@@ -210,12 +215,10 @@ export const IdeationWorkbench: React.FC<WorkbenchProps> = ({ initialIdea = '' }
                 <option value="python">Python</option>
               </select>
             </div>
-            <button className="action-button">
-              Générer l'architecture
-            </button>
+            <button className="action-button">Générer l'architecture</button>
           </div>
         );
-        
+
       case 'deployment':
         return (
           <div className="deployment">
@@ -231,12 +234,10 @@ export const IdeationWorkbench: React.FC<WorkbenchProps> = ({ initialIdea = '' }
                 <option value="azure">Azure</option>
               </select>
             </div>
-            <button className="action-button">
-              Préparer le déploiement
-            </button>
+            <button className="action-button">Préparer le déploiement</button>
           </div>
         );
-        
+
       default:
         return <div>Sélectionnez une étape du workflow</div>;
     }
@@ -247,14 +248,26 @@ export const IdeationWorkbench: React.FC<WorkbenchProps> = ({ initialIdea = '' }
       <div className="workbench-sidebar">
         <h2>Flux de travail</h2>
         <div className="workflow-steps">
-          {workflowSteps.map(step => (
-            <div 
+          {workflowSteps.map((step) => (
+            <div
               key={step.id}
               className={`workflow-step ${step.isActive ? 'active' : ''} ${step.isCompleted ? 'completed' : ''}`}
               onClick={() => step.isActive && activateStep(step.id)}
             >
               <div className="step-indicator">
-                {step.isCompleted ? '✓' : step.id === 'ideation' ? '1' : step.id === 'market' ? '2' : step.id === 'documentation' ? '3' : step.id === 'design' ? '4' : step.id === 'development' ? '5' : '6'}
+                {step.isCompleted
+                  ? '✓'
+                  : step.id === 'ideation'
+                    ? '1'
+                    : step.id === 'market'
+                      ? '2'
+                      : step.id === 'documentation'
+                        ? '3'
+                        : step.id === 'design'
+                          ? '4'
+                          : step.id === 'development'
+                            ? '5'
+                            : '6'}
               </div>
               <div className="step-info">
                 <h3>{step.name}</h3>
@@ -264,13 +277,13 @@ export const IdeationWorkbench: React.FC<WorkbenchProps> = ({ initialIdea = '' }
           ))}
         </div>
       </div>
-      
+
       <div className="workbench-content">
-        {activeView === 'results' 
+        {activeView === 'results'
           ? renderStepContent('results')
-          : renderStepContent(workflowSteps.find(s => s.id === activeView)?.id || 'ideation')}
+          : renderStepContent(workflowSteps.find((s) => s.id === activeView)?.id || 'ideation')}
       </div>
-      
+
       <style>{`
         .ideation-workbench {
           display: flex;

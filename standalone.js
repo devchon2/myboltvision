@@ -205,14 +205,14 @@ const server = http.createServer((req, res) => {
   } else if (req.url.startsWith('/')) {
     // Servir les fichiers statiques
     const filePath = path.join(PUBLIC_DIR, req.url);
-    
+
     // Vérifier si le fichier existe
     fs.access(filePath, fs.constants.F_OK, (err) => {
       if (err) {
         // Fichier non trouvé - vérifier s'il s'agit d'un favicon.svg ou logo.svg
         if (req.url === '/favicon.svg' || req.url === '/logo.svg') {
           const iconPath = path.join(__dirname, 'icons', path.basename(req.url));
-          
+
           fs.readFile(iconPath, (err, data) => {
             if (err) {
               // Échec de lecture du fichier dans /icons
@@ -220,7 +220,7 @@ const server = http.createServer((req, res) => {
               res.end('File not found');
               return;
             }
-            
+
             res.writeHead(200, { 'Content-Type': 'image/svg+xml' });
             res.end(data);
           });
@@ -231,18 +231,18 @@ const server = http.createServer((req, res) => {
         }
         return;
       }
-      
+
       // Fichier trouvé - déterminer le type MIME et servir le fichier
       const ext = path.extname(filePath);
       const contentType = MIME_TYPES[ext] || 'application/octet-stream';
-      
+
       fs.readFile(filePath, (err, data) => {
         if (err) {
           res.writeHead(500);
           res.end('Internal server error');
           return;
         }
-        
+
         res.writeHead(200, { 'Content-Type': contentType });
         res.end(data);
       });

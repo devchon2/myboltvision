@@ -1,41 +1,39 @@
 {
   "compilerOptions": {
+    "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "types": [
-      "vitest",
-      "@remix-run/cloudflare",
-      "vite/client",
-      "@cloudflare/workers-types/2023-07-01",
-      "@types/dom-speech-recognition"
-    ],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "resolveJsonModule": true,
     "isolatedModules": true,
     "esModuleInterop": true,
-    "jsx": "react-jsx",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "resolveJsonModule": true,
-    "target": "ESNext",
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
     "strict": true,
     "noImplicitAny": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "allowJs": true,
-    "skipLibCheck": true,
-    "verbatimModuleSyntax": false,
-    "forceConsistentCasingInFileNames": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noEmit": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./.tsbuildinfo",
     "baseUrl": ".",
+    "jsx": "react-jsx",
+    "types": [],
     "paths": {
-      "~/*": ["./app/*"]
+      "@/*": ["./app/*"],
+      "~/*": ["./*"],
+      "~/types/*": ["./types/*"],
+      "~/lib/*": ["./lib/*"],
+      "ai/*": ["./ai/*"]
     },
-
-    "noEmit": true
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "allowJs": true,
+    "typeRoots": ["./node_modules/@types", "./types"]
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "**/.server/**/*.ts",
-    "**/.server/**/*.tsx",
-    "**/.client/**/*.ts",
-    "**/.client/**/*.tsx"
-  ]
+  "include": ["app", "next-env.d.ts", "scripts", "types", "lib", "utils", ".next/types/**/*.ts"],
+  "exclude": ["node_modules", "build", ".next", "cypress", "cypress.config.js", "tsconfig.cypress.json"]
 }

@@ -7,15 +7,18 @@ export const IdeationWorkbench: React.FC<{ initialIdea?: string }> = ({ initialI
   const [idea, setIdea] = useState<string>(initialIdea);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [activeView, setActiveView] = useState<string>('ideation');
-  
+
   const handleIdeaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setIdea(e.target.value);
   };
 
   const handleStartWorkflow = async () => {
-    if (!idea.trim()) return;
+    if (!idea.trim()) {
+      return;
+    }
+
     setIsProcessing(true);
-    
+
     try {
       // Appelle réellement la fonction mockée dans les tests
       await runIdeationWorkflow(idea);
@@ -36,20 +39,14 @@ export const IdeationWorkbench: React.FC<{ initialIdea?: string }> = ({ initialI
       <div className="workbench-sidebar">
         <h2>Flux de travail</h2>
         <div className="workflow-steps">
-          <div 
-            className="workflow-step active"
-            onClick={() => activateStep('ideation')}
-          >
+          <div className="workflow-step active" onClick={() => activateStep('ideation')}>
             <div className="step-indicator">1</div>
             <div className="step-info">
               <h3>Idéation</h3>
               <p>Génération et raffinement d'idées</p>
             </div>
           </div>
-          <div 
-            className="workflow-step"
-            onClick={() => activateStep('market')}
-          >
+          <div className="workflow-step" onClick={() => activateStep('market')}>
             <div className="step-indicator">2</div>
             <div className="step-info">
               <h3>Analyse de marché</h3>
@@ -86,7 +83,7 @@ export const IdeationWorkbench: React.FC<{ initialIdea?: string }> = ({ initialI
           </div>
         </div>
       </div>
-      
+
       <div className="workbench-content">
         {activeView === 'ideation' ? (
           <div className="ideation-input">
@@ -99,12 +96,8 @@ export const IdeationWorkbench: React.FC<{ initialIdea?: string }> = ({ initialI
               className="idea-textarea"
               disabled={isProcessing}
             />
-            <button 
-              onClick={handleStartWorkflow}
-              disabled={!idea.trim() || isProcessing}
-              className="start-button"
-            >
-              {isProcessing ? 'Traitement en cours...' : 'Démarrer le processus d\'idéation'}
+            <button onClick={handleStartWorkflow} disabled={!idea.trim() || isProcessing} className="start-button">
+              {isProcessing ? 'Traitement en cours...' : "Démarrer le processus d'idéation"}
             </button>
           </div>
         ) : activeView === 'results' ? (
@@ -117,10 +110,10 @@ export const IdeationWorkbench: React.FC<{ initialIdea?: string }> = ({ initialI
         ) : activeView === 'market' ? (
           <div className="market-analysis">
             <h2>Analyse de marché</h2>
-            <p>Cette section vous permettra d'analyser le marché, la concurrence et les opportunités pour votre projet.</p>
-            <button className="action-button">
-              Lancer l'analyse de marché
-            </button>
+            <p>
+              Cette section vous permettra d'analyser le marché, la concurrence et les opportunités pour votre projet.
+            </p>
+            <button className="action-button">Lancer l'analyse de marché</button>
           </div>
         ) : (
           <div>Contenu de l'étape {activeView}</div>

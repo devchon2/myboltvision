@@ -1,0 +1,75 @@
+@charset "UTF-8";
+/* 
+ * Styles migré de l'application Remix vers Next.js
+ */
+.BaseChat {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.Chat {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: var(--chat-min-width, 400px);
+  height: 100%;
+}
+
+.PromptEffectContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.PromptEffectLine {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: url(#line-gradient);
+  stroke-width: 1.5;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: promptLineAnimation 3s ease-in-out infinite;
+}
+
+.PromptShine {
+  position: absolute;
+  fill: url(#shine-gradient);
+  animation: promptShineAnimation 3s ease-in-out infinite;
+}
+
+@keyframes promptLineAnimation {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  50% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -100;
+  }
+}
+@keyframes promptShineAnimation {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+} /*# sourceMappingURL=BaseChat.module.css.map */

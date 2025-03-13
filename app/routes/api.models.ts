@@ -1,8 +1,8 @@
 import { json, type LoaderFunctionArgs } from '@remix-run/cloudflare';
+import { getApiKeysFromCookie, getProviderSettingsFromCookie } from '~/lib/api/cookies';
 import { LLMManager } from '~/lib/modules/llm/manager';
 import type { ModelInfo } from '~/lib/modules/llm/types';
 import type { ProviderInfo } from '~/types/model';
-import { getApiKeysFromCookie, getProviderSettingsFromCookie } from '~/lib/api/cookies';
 
 interface ModelsResponse {
   modelList: ModelInfo[];
@@ -38,11 +38,7 @@ function getProviderInfo(llmManager: LLMManager) {
   return { providers: cachedProviders, defaultProvider: cachedDefaultProvider };
 }
 
-export async function loader({
-  request,
-  params,
-  context,
-}: LoaderFunctionArgs): Promise<Response> {
+export async function loader({ request, params, context }: LoaderFunctionArgs): Promise<Response> {
   const llmManager = LLMManager.getInstance(context.cloudflare?.env);
 
   // Get client side maintained API keys and provider settings from cookies

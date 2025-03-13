@@ -12,7 +12,6 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-
 // Configuration des variables d'environnement minimales
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
@@ -37,8 +36,8 @@ app.all(
   '*',
   createRequestHandler({
     build: path.resolve(__dirname, 'build'),
-    mode: process.env.NODE_ENV
-  })
+    mode: process.env.NODE_ENV,
+  }),
 );
 
 // Démarrer le serveur

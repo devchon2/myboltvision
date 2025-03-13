@@ -1,0 +1,144 @@
+.tabs {
+  font-family: var(--font-sans);
+}
+
+.tabList {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-bottom: 2px solid var(--border-color, #e2e8f0);
+
+  &.primary {
+    /* Primary tab style (underline) */
+    border-bottom: 2px solid var(--border-color, #e2e8f0);
+
+    .tabItem.selected .tabButton {
+      color: var(--primary-color, #3182ce);
+      border-bottom-color: var(--primary-color, #3182ce);
+    }
+  }
+
+  &.secondary {
+    background-color: var(--tab-list-secondary-bg, #f7fafc);
+    border-bottom: none;
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+
+    .tabItem {
+      margin-right: 0.5rem;
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      .tabButton {
+        background-color: var(--tab-secondary-button-bg, #edf2f7);
+        border-color: var(--tab-secondary-button-border, #e2e8f0);
+
+        &:hover,
+        &:focus {
+          background-color: var(--tab-secondary-button-hover-bg, #e2e8f0);
+          border-color: var(--tab-secondary-button-hover-border, #cbd5e0);
+        }
+
+        &[aria-selected='true'] {
+          background-color: var(--primary-color, #3182ce);
+          color: white;
+          border-color: var(--primary-color, #3182ce);
+
+          &:hover,
+          &:focus {
+            background-color: var(--primary-color-dark, #2b6cb0);
+            border-color: var(--primary-color-dark, #2b6cb0);
+          }
+        }
+      }
+    }
+  }
+
+  &.start {
+    justify-content: flex-start;
+  }
+
+  &.center {
+    justify-content: center;
+  }
+
+  &.end {
+    justify-content: flex-end;
+  }
+
+  &.fill {
+    justify-content: space-between;
+  }
+}
+
+.tabItem {
+  margin-bottom: -2px; /* Pour superposer la bordure inférieure */
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  &.selected .tabButton {
+    color: var(--primary-color, #3182ce);
+    border-bottom-color: var(--primary-color, #3182ce);
+  }
+
+  &.disabled .tabButton {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.tabButton {
+  position: relative;
+  display: block;
+  padding: 0.5rem 0.75rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-bottom-color 0.15s ease;
+
+  &:hover,
+  &:focus {
+    color: var(--primary-color, #3182ce);
+    outline: none;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 2px var(--primary-color, #3182ce);
+    border-radius: 0.25rem;
+  }
+
+  &[aria-selected='true'] {
+    cursor: default;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.tabPanels {
+  padding: 1rem 0;
+}
+
+//styles are needed for tab content in the future, uncomment and add them here
+.tabContent {
+  display: none;
+
+  &[aria-hidden='false'] {
+    display: block;
+  }
+
+  &[aria-hidden='true'] {
+    display: none;
+  }
+}

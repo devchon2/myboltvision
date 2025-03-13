@@ -2,13 +2,13 @@ import { useStore } from '@nanostores/react';
 import type { LinksFunction } from '@remix-run/cloudflare';
 import { json, type LoaderFunctionArgs } from '@remix-run/cloudflare';
 import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from '@remix-run/react';
-import { themeStore } from './lib/stores/theme';
-import { stripIndents } from './utils/stripIndent';
-import { createHead } from 'remix-island';
 import { useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { createHead } from 'remix-island';
 import { logStore } from './lib/stores/logs';
+import { themeStore } from './lib/stores/theme';
+import { stripIndents } from './utils/stripIndent';
 
 // Importation des styles via UnoCSS
 import 'virtual:uno.css';
@@ -85,7 +85,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export const indexLoader = async () => {
   return json({
-    message: "Welcome to BoltVision"
+    message: 'Welcome to BoltVision',
   });
 };
 
@@ -110,7 +110,7 @@ export default function App() {
 
 export function Index() {
   const data = useLoaderData();
-  
+
   return (
     <div>
       <h1>Welcome to BoltVision - {(data as { message: string }).message}</h1>

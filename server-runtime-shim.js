@@ -24,6 +24,5 @@ export const json = (data, init = {}) => {
 
 // Fonctions utilitaires minimales pour éviter les erreurs d'importation
 export const isRedirectResponse = (response) => {
-  return response instanceof Response && 
-    response.status >= 300 && response.status < 400;
+  return response instanceof Response && response.status >= 300 && response.status < 400;
 };

@@ -1,18 +1,20 @@
 import { type ActionFunctionArgs, json, type LoaderFunctionArgs } from '@remix-run/cloudflare';
-import { streamText } from '~/lib/.server/llm/stream-text';
-import type { IProviderSetting, ProviderInfo } from '~/types/model';
 import { generateText } from 'ai';
-import { PROVIDER_LIST } from '~/utils/constants';
 import { MAX_TOKENS } from '~/lib/.server/llm/constants';
+import { streamText } from '~/lib/.server/llm/stream-text';
+import { getApiKeysFromCookie, getProviderSettingsFromCookie } from '~/lib/api/cookies';
 import { LLMManager } from '~/lib/modules/llm/manager';
 import type { ModelInfo } from '~/lib/modules/llm/types';
-import { getApiKeysFromCookie, getProviderSettingsFromCookie } from '~/lib/api/cookies';
+import type { IProviderSetting, ProviderInfo } from '~/types/model';
+import { PROVIDER_LIST } from '~/utils/constants';
 import { createScopedLogger } from '~/utils/logger';
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  // Répondre aux requêtes GET avec un statut 405 Method Not Allowed
-  // Cette route est destinée uniquement aux requêtes POST
-  return json({ error: "Method not allowed. Use POST instead." }, { status: 405 });
+  /*
+   * Répondre aux requêtes GET avec un statut 405 Method Not Allowed
+   * Cette route est destinée uniquement aux requêtes POST
+   */
+  return json({ error: 'Method not allowed. Use POST instead.' }, { status: 405 });
 }
 
 export async function action(args: ActionFunctionArgs) {
