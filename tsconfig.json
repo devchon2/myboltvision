@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "typeRoots": [
+      "./node_modules/@types",
+      "./types"
+    ],
     "target": "ESNext",
     "lib": [
       "DOM",
@@ -44,7 +48,7 @@
       ]
     },
     "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": false,
     "allowJs": true,
     "typeRoots": [
       "./node_modules/@types",

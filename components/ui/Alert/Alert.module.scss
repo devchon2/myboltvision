@@ -1,0 +1,26 @@
+@import '../styles/variables.scss';
+@import '../styles/mixins.scss';
+
+.alert {
+  padding: var(--spacing-4);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-4);
+  color: white;
+  font-weight: var(--font-weight-medium);
+
+  &.success {
+    background-color: var(--color-success-main);
+  }
+
+  &.warning {
+    background-color: var(--color-warning-main);
+  }
+
+  &.error {
+    background-color: var(--color-error-main);
+  }
+
+  &.info {
+    background-color: var(--color-info-main);
+  }
+}

@@ -38,6 +38,15 @@ modelfiles
 
 # docs ignore
 site
+docs/architecture/core-components.md
+docs/architecture/migration-nextjs.md
+docs/technical/implementation-guide.md
+docs/technical/core/ContextManager.md
+docs/technical/core/LLMManager.md
+docs/technical/core/VectorCache.md
+docs/technical/deployment/performance-monitoring.md
+docs/fr/technique/context-manager.md
+docs/fr/technique/vector-db.md
 
 # commit file ignore
 app/commit.json
@@ -47,3 +56,5 @@ docs/instructions/Roadmap.md
 .cursorrules
 *.md
 .next/trace
+
+*storybook.log

@@ -1,0 +1,13 @@
+@import '../styles/variables.scss';
+@import '../styles/mixins.scss';
+
+.header {
+  width: 100%;
+  padding: var(--spacing-4) var(--spacing-6);
+  background-color: var(--color-primary-500);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-md);
+}

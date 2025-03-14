@@ -1,0 +1,13 @@
+@import '../styles/variables.scss';
+@import '../styles/mixins.scss';
+
+.footer {
+  width: 100%;
+  padding: var(--spacing-4) var(--spacing-6);
+  background-color: var(--color-neutral-900);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-md);
+}

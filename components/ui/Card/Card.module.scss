@@ -2,92 +2,14 @@
 @import '../styles/mixins.scss';
 
 .card {
-  display: flex;
-  flex-direction: column;
-  background-color: var(--color-background-default);
+  padding: var(--spacing-4);
+  background-color: white;
+  border: 1px solid var(--color-neutral-300);
   border-radius: var(--border-radius-md);
-  overflow: hidden;
-  position: relative;
-  width: 100%;
-  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease-in-out;
 
-  // Variantes
-  &--default {
-    border: 1px solid var(--color-neutral-200);
-    background-color: var(--color-background-default);
-  }
-
-  &--outlined {
-    border: 1px solid var(--color-primary-200);
-    background-color: transparent;
-  }
-
-  &--elevated {
-    border: none;
-    @include box-shadow(md);
-  }
-
-  // Modifieurs
-  &--fullWidth {
-    width: 100%;
-  }
-
-  &--rounded {
-    border-radius: var(--border-radius-xl);
-  }
-
-  &--noPadding {
-    .cardContent,
-    .cardHeader,
-    .cardFooter {
-      padding: 0;
-    }
-  }
-}
-
-.cardHeader {
-  padding: var(--spacing-4);
-  border-bottom: 1px solid var(--color-neutral-200);
-
-  // Si le header est la première partie visible
-  &:first-child {
-    border-top-left-radius: inherit;
-    border-top-right-radius: inherit;
-  }
-}
-
-.cardContent {
-  padding: var(--spacing-4);
-  flex: 1 1 auto;
-
-  // Si le contenu est la seule partie
-  &:first-child:last-child {
-    border-radius: inherit;
-  }
-}
-
-.cardFooter {
-  padding: var(--spacing-4);
-  border-top: 1px solid var(--color-neutral-200);
-
-  // Si le footer est la dernière partie visible
-  &:last-child {
-    border-bottom-left-radius: inherit;
-    border-bottom-right-radius: inherit;
-  }
-}
-
-// Responsive
-@include responsive-down(sm) {
-  .card {
-    &--elevated {
-      @include box-shadow(sm);
-    }
-  }
-
-  .cardHeader,
-  .cardContent,
-  .cardFooter {
-    padding: var(--spacing-3);
+  &:hover {
+    box-shadow: var(--shadow-md);
   }
 }
