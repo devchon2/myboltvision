@@ -1,7 +1,9 @@
 {
   "devFiles": [],
   "ampDevFiles": [],
-  "polyfillFiles": ["static/chunks/1c5ac_next_dist_build_polyfills_polyfill-nomodule.js"],
+  "polyfillFiles": [
+    "static/chunks/1c5ac_next_dist_build_polyfills_polyfill-nomodule.js"
+  ],
   "lowPriorityFiles": [],
   "rootMainFiles": [
     "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_d1e1793d._.js",

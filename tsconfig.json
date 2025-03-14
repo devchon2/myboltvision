@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ],
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "resolveJsonModule": true,
@@ -20,20 +24,53 @@
     "incremental": true,
     "tsBuildInfoFile": "./.tsbuildinfo",
     "baseUrl": ".",
-    "jsx": "react-jsx",
+    "jsx": "preserve",
     "types": [],
     "paths": {
-      "@/*": ["./app/*"],
-      "~/*": ["./*"],
-      "~/types/*": ["./types/*"],
-      "~/lib/*": ["./lib/*"],
-      "ai/*": ["./ai/*"]
+      "@/*": [
+        "./app/*"
+      ],
+      "~/*": [
+        "./*"
+      ],
+      "~/types/*": [
+        "./types/*"
+      ],
+      "~/lib/*": [
+        "./lib/*"
+      ],
+      "ai/*": [
+        "./ai/*"
+      ]
     },
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "allowJs": true,
-    "typeRoots": ["./node_modules/@types", "./types"]
+    "typeRoots": [
+      "./node_modules/@types",
+      "./types"
+    ],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
-  "include": ["app", "next-env.d.ts", "scripts", "types", "lib", "utils", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "build", ".next", "cypress", "cypress.config.js", "tsconfig.cypress.json"]
+  "include": [
+    "app",
+    "next-env.d.ts",
+    "scripts",
+    "types",
+    "lib",
+    "utils",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "build",
+    ".next",
+    "cypress",
+    "cypress.config.js",
+    "tsconfig.cypress.json"
+  ]
 }

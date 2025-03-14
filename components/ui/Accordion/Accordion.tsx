@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, ReactElement, ReactNode, Children, cloneElement } from 'react';
 import styles from './Accordion.module.scss'
 
+
 export interface AccordionItemProps {
   /**
    * Titre de l'élément d'accordéon

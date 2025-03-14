@@ -1,9 +1,0 @@
-{
-  "[project]/components/git/GitUrlImport.client.tsx [app-client] (ecmascript, next/dynamic entry)": {
-    "id": "[project]/components/git/GitUrlImport.client.tsx [app-client] (ecmascript, next/dynamic entry)",
-    "files": [
-      "static/chunks/components_git_GitUrlImport_client_tsx_10e5c997._.js",
-      "static/chunks/components_git_GitUrlImport_client_tsx_c50600f4._.js"
-    ]
-  }
-}

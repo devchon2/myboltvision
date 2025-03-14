@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { StreamingMessageParser } from './message-parser.js';
 
-type ExpectedResult = string;
 
 describe('StreamingMessageParser', () => {
   it('should pass through normal text', () => {

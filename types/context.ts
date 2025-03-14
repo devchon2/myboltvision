@@ -1,10 +1,35 @@
 export interface ContextShard {
-  // ...existing code...
+  id: string;
+  type: string;
+  content: string;
+  timestamp: number;
+  complexityMetric: number;
+  innovationPotential: number;
+  metadata: {
+    createdAt: Date;
+    updatedAt: Date;
+    version: string;
+  };
   relatedClusters: ContextCluster[];
-  // ...existing code...
+  data: Record<string, any>;
+  parentContextId: string;
 }
 
 export interface ContextCluster {
   primaryShard?: ContextShard;
-  // ...existing code...
+  data: Record<string, any>;
+  content: string;
+  relatedClusters: ContextCluster[];
+  timestamp: number;
+  complexityMetric: number;
+  innovationPotential: number;
+  metadata: {
+    createdAt: Date;
+    updatedAt: Date;
+    version: string;
+  };
+  shards: ContextShard[];
+  id: string;
+  type: string;
+  vectors?: number[];
 }

@@ -1,53 +1,55 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { LLMManager } from '../lib/modules/llm/manager';
-import { BaseProvider } from '../lib/modules/llm/base-provider';
-import type { IProviderSetting } from '../types/types/model';
-import type { ModelInfo } from '../lib/modules/llm/types';
 
-// Mock pour la fonction de journalisation
-vi.mock('../utils/logger', () => {
-  return {
-    createScopedLogger: () => ({
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-    }),
-  };
-});
+// 1. Déclaration de la classe MockBaseProvider AVANT les mocks
+class MockBaseProvider {
+  name: string;
+  staticModels: any[];
+  getDynamicModels?: any;
+  getModelsFromCache?: any;
+  storeDynamicModels?: any;
 
-// Mock pour le registre des providers
-vi.mock('../lib/modules/llm/registry', async () => {
+  constructor(name: string, staticModels: any[]) {
+    this.name = name;
+    this.staticModels = staticModels;
+  }
+}
+
+// 2. Mock pour BaseProvider
+vi.mock('../lib/modules/llm/base-provider.js', () => ({
+  BaseProvider: MockBaseProvider,
+}));
+
+// 3. Mock pour le registre des providers
+vi.mock('../lib/modules/llm/registry.js', () => {
   const MockProvider1 = vi.fn().mockImplementation(() => {
-    return {
-      name: 'mock-provider-1',
-      staticModels: [
-        { name: 'static-model-1', provider: 'mock-provider-1', maxTokenAllowed: 4000, label: 'Static Model 1' },
-        { name: 'static-model-2', provider: 'mock-provider-1', maxTokenAllowed: 8000, label: 'Static Model 2' },
-      ],
-      getDynamicModels: vi.fn().mockImplementation(async () => {
-        return [
-          { name: 'dynamic-model-1', provider: 'mock-provider-1', maxTokenAllowed: 16000, label: 'Dynamic Model 1' },
-          { name: 'dynamic-model-2', provider: 'mock-provider-1', maxTokenAllowed: 32000, label: 'Dynamic Model 2' },
-        ];
-      }),
-      getModelsFromCache: vi.fn(),
-      storeDynamicModels: vi.fn(),
-    };
+    const provider = new MockBaseProvider('mock-provider-1', [
+      { name: 'static-model-1', provider: 'mock-provider-1', maxTokenAllowed: 4000, label: 'Static Model 1' },
+      { name: 'static-model-2', provider: 'mock-provider-1', maxTokenAllowed: 8000, label: 'Static Model 2' },
+    ]);
+
+    provider.getDynamicModels = vi.fn().mockImplementation(async () => {
+      return [
+        { name: 'dynamic-model-1', provider: 'mock-provider-1', maxTokenAllowed: 16000, label: 'Dynamic Model 1' },
+        { name: 'dynamic-model-2', provider: 'mock-provider-1', maxTokenAllowed: 32000, label: 'Dynamic Model 2' },
+      ];
+    });
+
+    provider.getModelsFromCache = vi.fn();
+    provider.storeDynamicModels = vi.fn();
+
+    return provider;
   });
 
   const MockProvider2 = vi.fn().mockImplementation(() => {
-    return {
-      name: 'mock-provider-2',
-      staticModels: [
-        { name: 'static-model-3', provider: 'mock-provider-2', maxTokenAllowed: 4000, label: 'Static Model 3' },
-      ],
-      getModelsFromCache: vi.fn(),
-      storeDynamicModels: vi.fn(),
-    };
-  });
+    const provider = new MockBaseProvider('mock-provider-2', [
+      { name: 'static-model-3', provider: 'mock-provider-2', maxTokenAllowed: 4000, label: 'Static Model 3' },
+    ]);
 
-  MockProvider1.prototype = Object.create(BaseProvider.prototype);
-  MockProvider2.prototype = Object.create(BaseProvider.prototype);
+    provider.getModelsFromCache = vi.fn();
+    provider.storeDynamicModels = vi.fn();
+
+    return provider;
+  });
 
   return {
     MockProvider1,
@@ -55,6 +57,21 @@ vi.mock('../lib/modules/llm/registry', async () => {
   };
 });
 
+// 4. Mock pour le logger
+vi.mock('../utils/logger.js', () => ({
+  createScopedLogger: () => ({
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+  }),
+}));
+
+// 5. Imports des modules nécessaires
+import { LLMManager } from '../lib/modules/llm/manager.js';
+import type { IProviderSetting } from '../types/model.js';
+import type { ModelInfo } from '../lib/modules/llm/types.js';
+
+// 6. Tests
 describe('LLMManager', () => {
   // Créer une fonction pour réinitialiser le singleton entre les tests
   const resetSingleton = () => {
@@ -116,7 +133,7 @@ describe('LLMManager', () => {
     const manager = LLMManager.getInstance();
 
     const apiKeys = { 'mock-provider-1': 'test-api-key' };
-    const providerSettings: Record<string, IProviderSetting> = {
+    const providerSettings: Record<string, any> = {
       'mock-provider-1': { enabled: true },
       'mock-provider-2': { enabled: true },
     };

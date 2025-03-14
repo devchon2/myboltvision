@@ -1,9 +1,23 @@
 // vitest.setup.js
-import { vi } from 'vitest';
+import { 
+  vi, 
+  describe as vitestDescribe, 
+  it as vitestIt, 
+  test as vitestTest, 
+  expect as vitestExpect, 
+  beforeEach as vitestBeforeEach, 
+  afterEach as vitestAfterEach
+} from 'vitest';
 import '@testing-library/jest-dom/vitest';
 
 // Assurer que les fonctions globales sont disponibles
 globalThis.vi = vi;
+globalThis.describe = vitestDescribe as unknown as typeof globalThis.describe;
+globalThis.it = vitestIt as unknown as typeof globalThis.it;
+globalThis.test = vitestTest as unknown as typeof globalThis.test;
+globalThis.expect = vitestExpect as unknown as typeof globalThis.expect;
+globalThis.beforeEach = vitestBeforeEach as unknown as typeof globalThis.beforeEach;
+globalThis.afterEach = vitestAfterEach as unknown as typeof globalThis.afterEach;
 
 // Configure les mocks globaux pour les tests
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
@@ -11,36 +25,6 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
   unobserve: vi.fn(),
   disconnect: vi.fn(),
 }));
-
-// Mock complet de import.meta
-global.import = {
-  meta: {
-    env: {
-      SSR: false,
-      DEV: true,
-      PROD: false,
-      MODE: 'development',
-      VITE_WEB_CONTAINER_API_KEY: 'test-key',
-    },
-    hot: {
-      accept: vi.fn(),
-      dispose: vi.fn(),
-      data: {
-        files: new Map(),
-        modifiedFiles: new Map(),
-        artifacts: new Map(),
-        unsavedFiles: new Set(),
-        showWorkbench: false,
-        currentView: 'code',
-        actionAlert: undefined,
-        webcontainer: undefined,
-        webcontainerContext: {
-          loaded: false,
-        },
-      },
-    },
-  },
-};
 
 // Mock de webcontainer
 vi.mock('app/lib/webcontainer', () => ({

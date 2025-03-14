@@ -1,4 +1,4 @@
-import type { ContextCluster } from '../../types/context';
+import type { ContextCluster } from '../../types/context.js';
 
 export class SecurityManager {
   private apiKeys: Map<string, string>;
@@ -22,5 +22,29 @@ export class SecurityManager {
   async secureData(context: ContextCluster): Promise<void> {
     // Implement data isolation and audit mechanisms here
     console.log('Data secured:', context);
+  }
+
+  /**
+   * Sanitise le texte fourni pour éliminer les éléments HTML potentiellement dangereux
+   * @param text Le texte à sanitiser
+   * @returns Le texte sanitisé
+   */
+  sanitize(text: string): string {
+    // Supprimer les balises de script
+    let sanitized = text.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    
+    // Supprimer les événements inline
+    sanitized = sanitized.replace(/on\w+="[^"]*"/gi, '');
+    sanitized = sanitized.replace(/on\w+='[^']*'/gi, '');
+    
+    // Échapper les caractères HTML spéciaux
+    sanitized = sanitized
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+    
+    return sanitized;
   }
 }

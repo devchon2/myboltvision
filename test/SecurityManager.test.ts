@@ -1,6 +1,4 @@
-// @ts-nocheck
-/// <reference types="vitest" />
-import { SecurityManager } from '../lib/security/SecurityManager.ts';
+import { SecurityManager } from '../lib/security/SecurityManager.js';
 import { describe, it, expect, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
 

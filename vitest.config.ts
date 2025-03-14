@@ -3,7 +3,7 @@ import { defineConfig } from 'vitest/config';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
-  plugins: [tsconfigPaths()],
+  // plugins: [tsconfigPaths()],
   test: {
     globals: true, // Explicitly set globals to true
     environment: 'jsdom',
@@ -11,6 +11,7 @@ export default defineConfig({
       '**/*.{test,spec}.{js,ts,jsx,tsx}',
       'lib/**/*.{test,spec}.{js,ts,jsx,tsx}',
       'app/**/*.{test,spec}.{js,ts,jsx,tsx}',
+      'utils/**/*.{test,spec}.{js,ts,jsx,tsx}', // Ajout explicite pour les tests dans utils
     ],
     setupFiles: ['./vitest.setup.ts'],
     server: {
@@ -23,7 +24,6 @@ export default defineConfig({
     sequence: {
       hooks: 'list',
     },
-    environmentMatchGlobs: [['**/*.{test,spec}.{jsx,tsx}', 'jsdom']],
   },
   resolve: {
     alias: {
