@@ -1,3 +1,27 @@
 {
-  "/page": "app/page.js"
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/check-env-key/route": "app/api/check-env-key/route.js",
+  "/api/health/route": "app/api/health/route.js",
+  "/api/git-proxy/[...path]/route": "app/api/git-proxy/[...path]/route.js",
+  "/api/llmcall/route": "app/api/llmcall/route.js",
+  "/api/models/[provider]/route": "app/api/models/[provider]/route.js",
+  "/api/models/route": "app/api/models/route.js",
+  "/api/system/git-info/route": "app/api/system/git-info/route.js",
+  "/api/update/route": "app/api/update/route.js",
+  "/api/system/app-info/route": "app/api/system/app-info/route.js",
+  "/contact/page": "app/contact/page.js",
+  "/chat/page": "app/chat/page.js",
+  "/features/page": "app/features/page.js",
+  "/chat/[id]/page": "app/chat/[id]/page.js",
+  "/pricing/page": "app/pricing/page.js",
+  "/page": "app/page.js",
+  "/settings/page": "app/settings/page.js",
+  "/workbench/[id]/page": "app/workbench/[id]/page.js",
+  "/workbench/page": "app/workbench/page.js",
+  "/auth/register/page": "app/auth/register/page.js",
+  "/auth/reset-password/page": "app/auth/reset-password/page.js",
+  "/auth/login/page": "app/auth/login/page.js",
+  "/git/page": "app/git/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/webcontainer/preview/[id]/page": "app/webcontainer/preview/[id]/page.js"
 }

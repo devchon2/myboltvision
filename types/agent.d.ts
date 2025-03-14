@@ -14,3 +14,22 @@ export interface Agent {
   capabilities: string[];
   execute(input: string, context?: ContextCluster): Promise<AgentResult>;
 }
+
+export interface AgentTask {
+  objective: string;
+  constraints: string[];
+  context?: ProjectContext;
+}
+
+export interface ExecutionResult {
+  status: 'success' | 'partial' | 'failed';
+  generatedAssets: {
+    code?: string[];
+    documentation?: string[];
+    tests?: string[];
+  };
+  metrics: {
+    executionTime: number;
+    resourceUsage: object;
+  };
+}

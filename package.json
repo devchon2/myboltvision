@@ -134,6 +134,7 @@
     "@mui/material": "^6.4.7",
     "@octokit/graphql": "^8.2.1",
     "@pinecone-database/pinecone": "^5.1.1",
+    "@supabase/supabase-js": "^2.49.1",
     "@types/node-fetch": "^2.6.12",
     "chrome-launcher": "^1.1.2",
     "cypress": "^14.2.0",
