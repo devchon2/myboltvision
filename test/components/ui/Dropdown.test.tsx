@@ -2,10 +2,10 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
-import Dropdown from '../../../components/ui/Dropdown/Dropdown';
+import Dropdown, { DropdownOption } from '../../../components/ui/Dropdown/Dropdown';
 
 describe('Dropdown Component', () => {
-  const options = [
+  const options: DropdownOption[] = [
     { id: '1', label: 'Option 1', value: 'option1' },
     { id: '2', label: 'Option 2', value: 'option2' },
     { id: '3', label: 'Option 3', value: 'option3' },
@@ -24,8 +24,7 @@ describe('Dropdown Component', () => {
     
     // Vérifier que le menu s'ouvre
     await waitFor(() => {
-      const option1 = screen.getByText('Option 1');
-      expect(option1).toBeInTheDocument();
+      expect(screen.getByText('Option 1')).toBeInTheDocument();
     });
   });
 

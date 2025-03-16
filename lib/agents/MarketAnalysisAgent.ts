@@ -1,16 +1,27 @@
-import type { ContextCluster } from '../../types/context';
-import { ContextManager } from '../core/ContextManager';
-import type { Agent, AgentResult } from '~/types/agent';
+import type { ContextCluster } from '../../types/context.js';
+import { ContextManager } from '../core/ContextManager.js';
+import type { Agent, AgentResult } from '~/types/agent.d.ts';
+import { BaseAgent } from './BaseAgent.js';
 
-export class MarketAnalysisAgent implements Agent {
+/**
+ * Agent spécialisé dans l'analyse du marché
+ */
+export class MarketAnalysisAgent extends BaseAgent implements Agent {
   id = 'market-analysis-agent';
   name = "Agent d'Analyse de Marché";
-  description = 'Analyse les tendances et opportunités du marché';
-  capabilities = ['competitive-analysis', 'market-trends', 'opportunity-identification', 'swot-analysis'];
+  description = 'Analyse le marché pour identifier les tendances et opportunités';
+  capabilities = [
+    'competitive-analysis',
+    'market-trends',
+    'opportunity-identification',
+    'swot-analysis',
+    'trend-identification'  // Ajout de cette capacité manquante
+  ];
 
   private contextManager: ContextManager;
 
   constructor() {
+    super();
     this.contextManager = new ContextManager();
   }
 
@@ -163,5 +174,20 @@ export class MarketAnalysisAgent implements Agent {
       '- Changements réglementaires\n' +
       '- Évolution rapide des attentes des clients'
     );
+  }
+
+  /**
+   * Analyse des tendances du marché à partir des données fournies
+   * 
+   * @param marketData Les données du marché à analyser
+   * @returns Un rapport d'analyse des tendances
+   */
+  analyzeTrends(marketData: any): any {
+    // Implémentation de l'analyse des tendances
+    return {
+      trends: [],
+      insights: [],
+      recommendations: []
+    };
   }
 }

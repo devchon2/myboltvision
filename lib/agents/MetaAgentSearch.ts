@@ -1,5 +1,4 @@
-import type { ContextCluster } from '../../types/types/context.js';
-import { ContextManager } from '../core/ContextManager.js';
+import type { ContextCluster, } from '../../types/context.js';
 import type { Agent, AgentResult } from '../../types/agent.d.ts';
 
 export class MetaAgentSearch implements Agent {
@@ -8,11 +7,6 @@ export class MetaAgentSearch implements Agent {
   description = "Orchestre les interactions entre agents et optimise les résultats";
   capabilities = ['agent-discovery', 'feedback-automation', 'conflict-resolution', 'agent-programming'];
 
-  private contextManager: ContextManager;
-
-  constructor() {
-    this.contextManager = new ContextManager();
-  }
 
   async execute(input: string, context?: ContextCluster): Promise<AgentResult> {
     // Validation renforcée des entrées
@@ -118,7 +112,7 @@ export class MetaAgentSearch implements Agent {
   private analyzeRequestType(input: string): string {
     const lowerInput = input
       .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[-]/g, '')
       .toLowerCase();
 
     // Détection des balises spéciales en premier
@@ -158,7 +152,7 @@ export class MetaAgentSearch implements Agent {
     return 'generic';
   }
 
-  private async discoverRelevantAgents(input: string, context: ContextCluster): Promise<string[]> {
+  private async discoverRelevantAgents( _input: string, _context: ContextCluster): Promise<string[]> {
     // Simuler la découverte d'agents pertinents pour la tâche demandée
     const availableAgents = [
       {
@@ -196,7 +190,7 @@ export class MetaAgentSearch implements Agent {
     );
   }
 
-  private async generateFeedback(input: string, context: ContextCluster): Promise<string> {
+  private async generateFeedback( _input: string, _context: ContextCluster): Promise<string> {
     // Simuler la génération de feedback automatique
     const feedbackCategories = [
       {
@@ -229,7 +223,7 @@ export class MetaAgentSearch implements Agent {
     ];
 
     // Construire le feedback formaté
-    let feedback = `Feedback automatisé pour: "${input.substring(0, 50)}${input.length > 50 ? '...' : ''}"\n\n`;
+    let feedback = `Feedback automatisé pour: "${_input.substring(0, 50)}${_input.length > 50 ? '...' : ''}"\n\n`;
     
     feedbackCategories.forEach(category => {
       feedback += `## ${category.category} (Score: ${category.score.toFixed(2)})\n`;
@@ -248,7 +242,7 @@ export class MetaAgentSearch implements Agent {
     return feedback;
   }
 
-  private async resolveConflicts(input: string, context: ContextCluster): Promise<string> {
+  private async resolveConflicts(_input: string, _context: ContextCluster): Promise<string> {
     // Simuler la résolution de conflits entre agents
     const detectedConflicts = [
       {
@@ -268,7 +262,7 @@ export class MetaAgentSearch implements Agent {
     ];
 
     // Construire la réponse de résolution
-    let resolution = `Résolution des conflits pour: "${input.substring(0, 50)}${input.length > 50 ? '...' : ''}"\n\n`;
+    let resolution = `Résolution des conflits pour: "${_input.substring(0, 50)}${_input.length > 50 ? '...' : ''}"\n\n`;
     
     detectedConflicts.forEach((conflict, index) => {
       resolution += `## Conflit ${index + 1}: ${conflict.id}\n`;
@@ -286,12 +280,12 @@ export class MetaAgentSearch implements Agent {
     return resolution;
   }
 
-  private async programNewAgent(input: string, context: ContextCluster): Promise<string> {
+  private async programNewAgent(input: string, _context: ContextCluster): Promise<string> {
     // Simuler la programmation d'un nouvel agent
     const agentTemplate = `
 import type { ContextCluster } from '../../types/types/context.js';
 import { ContextManager } from '../core/ContextManager.js';
-import type { Agent, AgentResult } from '../../types/agent.d.ts';
+import type { Agent, AgentResult } from '../../types/agent.js';
 
 export class CustomAgent implements Agent {
   id = 'custom-agent-${Date.now().toString(36)}';

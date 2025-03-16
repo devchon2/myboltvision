@@ -1,6 +1,5 @@
-import type { ContextCluster } from '../../types/context';
-import { ContextManager } from '../core/ContextManager';
-import type { Agent, AgentResult } from '~/types/agent';
+import type { ContextCluster } from '../../types/context.d.ts';
+import type { Agent, AgentResult } from '~/types/agent.d.ts';
 
 export class DevAgent implements Agent {
   id = 'dev-agent';
@@ -8,10 +7,8 @@ export class DevAgent implements Agent {
   description = 'Développe et améliore le code en suivant les meilleures pratiques';
   capabilities = ['code-generation', 'code-review', 'refactoring', 'debugging'];
 
-  private contextManager: ContextManager;
-
   constructor() {
-    this.contextManager = new ContextManager();
+    // Constructeur sans initialisation de contextManager
   }
 
   async execute(input: string, context?: ContextCluster): Promise<AgentResult> {
@@ -41,7 +38,7 @@ export class DevAgent implements Agent {
 
     switch (requestType) {
       case 'code-generation':
-        content = await this.generateCode(input, context);
+        content = await this.generateCode(input);
         break;
       case 'code-review':
         content = await this.reviewCode(input, context);
@@ -109,7 +106,7 @@ export class DevAgent implements Agent {
     return 'generic';
   }
 
-  private async generateCode(input: string, context: ContextCluster): Promise<string> {
+  private async generateCode(_input: string): Promise<string> {
     // Logique de génération de code
     return (
       'Code généré:\n```typescript\n' +
@@ -123,7 +120,7 @@ export class DevAgent implements Agent {
     );
   }
 
-  private async reviewCode(input: string, context: ContextCluster): Promise<string> {
+  private async reviewCode(_input: string, context: ContextCluster): Promise<string> {
     // Logique de revue de code
     return (
       'Revue de Code:\n' +
@@ -134,7 +131,7 @@ export class DevAgent implements Agent {
     );
   }
 
-  private async refactorCode(input: string, context: ContextCluster): Promise<string> {
+  private async refactorCode(_input: string, _context: ContextCluster): Promise<string> {
     // Logique de refactoring
     return (
       'Refactoring proposé:\n' +
@@ -146,7 +143,7 @@ export class DevAgent implements Agent {
     );
   }
 
-  private async debugCode(input: string, context: ContextCluster): Promise<string> {
+  private async debugCode(_input: string, _context: ContextCluster): Promise<string> {
     // Logique de débogage
     return (
       'Rapport de débogage:\n' +

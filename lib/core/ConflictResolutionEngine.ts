@@ -1,19 +1,8 @@
-import { Agent, AgentResult } from './AgentOrchestrator.js';
+import type { Agent, AgentResult, ConflictDescriptor, ResolutionStrategy } from '../../types/agent.d.ts';
 
-export interface ConflictDescriptor {
-  id: string;
-  agentIds: string[];
-  description: string;
-  severity: 'low' | 'medium' | 'high';
-  timestamp: number;
-}
-
-export interface ResolutionStrategy {
-  id: string;
-  name: string;
-  description: string;
-  applyResolution: (conflict: ConflictDescriptor, results: AgentResult[]) => Promise<AgentResult>;
-}
+// Réexporter les interfaces pour compatibilité
+export type { ConflictDescriptor, ResolutionStrategy };
+import { standardizeAgentResult } from '../adapters/AgentResultAdapter.js';
 
 /**
  * Le ConflictResolutionEngine est responsable de détecter et résoudre les conflits 
@@ -111,7 +100,8 @@ export class ConflictResolutionEngine {
     // Si une stratégie spécifique est demandée, l'utiliser
     if (strategyId && this.strategies.has(strategyId)) {
       const strategy = this.strategies.get(strategyId)!;
-      return await strategy.applyResolution(conflict, results);
+      const rawResult = await strategy.applyResolution(conflict, results);
+      return standardizeAgentResult(rawResult);
     }
     
     // Si un meta-agent est disponible, l'utiliser pour résoudre le conflit
@@ -135,23 +125,35 @@ export class ConflictResolutionEngine {
         timestamp: Date.now()
       };
       
-      return await this.metaAgent.execute(input, context as any);
+      const rawResult = await this.metaAgent.execute(input, context as any);
+      return standardizeAgentResult(rawResult);
     }
     
     // Fallback: retourner le résultat avec la confiance la plus élevée
     const conflictingResults = results.filter(r => conflict.agentIds.includes(r.agentId));
-    return conflictingResults.reduce((highest, current) => {
+    const bestResult = conflictingResults.reduce((highest, current) => {
       const currentConfidence = current.metadata.confidence || 0;
       const highestConfidence = highest.metadata.confidence || 0;
       return currentConfidence > highestConfidence ? current : highest;
     }, conflictingResults[0]);
+    
+    return standardizeAgentResult(bestResult);
   }
 
   /**
    * Récupère l'historique des conflits détectés
    */
   getConflictHistory(): ConflictDescriptor[] {
-    return [...this.conflicts];
+    // Trier les conflits par sévérité (high, medium, low)
+    const sortedConflicts = [...this.conflicts].sort((a, b) => {
+      const severityOrder: { [key: string]: number } = {
+        'high': 1,
+        'medium': 2,
+        'low': 3
+      };
+      return (severityOrder[a.severity] || 4) - (severityOrder[b.severity] || 4);
+    });
+    return sortedConflicts;
   }
 
   /**

@@ -50,10 +50,6 @@
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": false,
     "allowJs": true,
-    "typeRoots": [
-      "./node_modules/@types",
-      "./types"
-    ],
     "plugins": [
       {
         "name": "next"

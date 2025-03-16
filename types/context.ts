@@ -31,5 +31,9 @@ export interface ContextCluster {
   shards: ContextShard[];
   id: string;
   type: string;
-  vectors?: number[];
+  vectors?: {
+    embedding: number[];
+    metadata: Record<string, any>;
+    content: string;
+  }[];
 }

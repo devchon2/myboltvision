@@ -2,8 +2,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import React from 'react';
 import '@testing-library/jest-dom';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { runIdeationWorkflow } from '../../../lib/examples/ideation-workflow';
-import { IdeationWorkbench } from '../IdeationWorkbench';
+import { runIdeationWorkflow } from '../../../lib/examples/ideation-workflow.js';
+import { IdeationWorkbench } from '../IdeationWorkbench.js';
 
 // Utilisation des mocks automatiques de Vitest
 vi.mock('../../../lib/stores/workbench');

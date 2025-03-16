@@ -14,5 +14,9 @@ describe('DevAgent', () => {
     expect(agent.description).toBeDefined();
     expect(agent.capabilities).toContain('debugging');
     expect(agent.capabilities).toContain('code-generation');
+    expect(agent.capabilities).toContain('code-review');
+    expect(agent.capabilities).toContain('refactoring');
+    expect(agent.capabilities).toContain('testing');
+  
   });
 });

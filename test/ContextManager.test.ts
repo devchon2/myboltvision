@@ -78,4 +78,14 @@ describe('ContextManager', () => {
     expect(basicScore).toBeGreaterThan(0);
     expect(innovativeScore).toBeGreaterThan(basicScore);
   });
+
+  it('should analyze context and return complexity and innovation scores', () => {
+    const text = 'This is a test context about AI and blockchain.';
+    const analysis = manager.analyzeContext(text);
+
+    expect(analysis).toHaveProperty('complexity');
+    expect(analysis).toHaveProperty('innovation');
+    expect(analysis.complexity).toBeGreaterThan(0);
+    expect(analysis.innovation).toBeGreaterThan(0);
+  });
 });

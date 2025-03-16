@@ -1,5 +1,5 @@
 import { map } from 'nanostores';
-import type { ContextCluster } from '../../types/types/context.js';
+import type {  ContextCluster } from '../../types/types/context.js';
 import { VectorDB } from './VectorDB.js';
 
 export class ContextManager {

@@ -1,30 +1,9 @@
-import { Agent, AgentResult, Workflow, WorkflowStep } from './AgentOrchestrator.js';
+import type { Agent, AgentResult, Workflow, WorkflowStep, DAG, DAGNode, DAGEdge } from '../../types/agent.d.ts';
 
-export interface DAGNode {
-  id: string;
-  type: 'agent' | 'decision' | 'merger' | 'splitter';
-  agentId?: string;
-  metadata: Record<string, any>;
-  inputs: string[];  // IDs des nœuds qui fournissent des entrées
-  outputs: string[]; // IDs des nœuds qui reçoivent des sorties
-}
-
-export interface DAGEdge {
-  id: string;
-  source: string;  // ID du nœud source
-  target: string;  // ID du nœud cible
-  condition?: (result: AgentResult) => boolean;
-  transformation?: (result: AgentResult) => any;
-}
-
-export interface DAG {
-  id: string;
-  name: string;
-  description: string;
-  nodes: DAGNode[];
-  edges: DAGEdge[];
-  metadata: Record<string, any>;
-}
+// Réexporter ces types pour la compatibilité avec le code existant
+export type { DAG, DAGNode, DAGEdge };
+import { standardizeAgentResult } from '../adapters/AgentResultAdapter.js';
+import { standardizeAgent } from '../adapters/LegacyAgentAdapter.js';
 
 /**
  * Le DynamicDAGEngine permet de créer, modifier et exécuter des workflows
@@ -38,8 +17,10 @@ export class DynamicDAGEngine {
   /**
    * Enregistre un agent dans le moteur DAG
    */
-  registerAgent(agent: Agent): void {
-    this.agents.set(agent.id, agent);
+  registerAgent(agent: Agent | Partial<Agent>): void {
+    // Standardiser l'agent avant de l'enregistrer
+    const standardizedAgent = (agent as Agent).id ? agent as Agent : standardizeAgent(agent);
+    this.agents.set(standardizedAgent.id, standardizedAgent);
   }
 
   /**
@@ -302,7 +283,9 @@ export class DynamicDAGEngine {
           timestamp: Date.now()
         };
         
-        result = await agent.execute(input, context as any);
+        // Exécuter l'agent et standardiser le résultat
+        const rawResult = await agent.execute(input, context as any);
+        result = standardizeAgentResult(rawResult);
         break;
         
       case 'merger':
@@ -335,33 +318,33 @@ export class DynamicDAGEngine {
           }
         }
         
-        // Fusionner les résultats (exemple simplifié)
-        result = {
-          id: `result-${nodeId}`,
+        // Fusionner les résultats en utilisant standardizeAgentResult
+        result = standardizeAgentResult({
           agentId: 'merger',
           content: inputResults.map(r => r.content).join('\n\n'),
-          timestamp: Date.now(),
+          success: true,
           metadata: {
+            id: `result-${nodeId}`,
+            timestamp: Date.now(),
             type: 'merged',
-            sourceResults: inputResults.map(r => r.id)
-          },
-          success: true
-        };
+            sourceResults: inputResults.map(r => r.metadata?.id || 'unknown')
+          }
+        });
         break;
         
       case 'decision':
       case 'splitter':
         // Implémentation simplifiée
-        result = {
-          id: `result-${nodeId}`,
+        result = standardizeAgentResult({
           agentId: node.type,
           content: input,
-          timestamp: Date.now(),
+          success: true,
           metadata: {
+            id: `result-${nodeId}`,
+            timestamp: Date.now(),
             type: node.type
-          },
-          success: true
-        };
+          }
+        });
         break;
         
       default:

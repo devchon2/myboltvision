@@ -1,101 +1,56 @@
-import type { ContextCluster } from '../../types/types/context.js';
-import { ContextManager } from '../core/ContextManager.js';
-import type { Agent, AgentResult } from '../../types/agent.d.ts';
+import type { ContextShard } from '../../types/context.js';
+import type { Agent, AgentResult } from '../../types/agent.js';
 
 export class BusinessStrategyAgent implements Agent {
   id = 'business-strategy-agent';
   name = "Agent de Stratégie Business";
   description = "Analyse financière et stratégie d'entreprise";
-  capabilities = ['market-analysis', 'financial-projection', 'strategic-planning', 'competition-analysis'];
+  capabilities = ['financial-analysis', 'business-strategy', 'market-research', 'competition-analysis'];
 
-  private contextManager: ContextManager;
-
-  constructor() {
-    this.contextManager = new ContextManager();
-  }
-
-  async execute(input: string, context?: ContextCluster): Promise<AgentResult> {
+  async execute(input: string, context?: ContextShard): Promise<AgentResult> {
     // Validation renforcée des entrées
     if (typeof input !== 'string' || !input.trim()) {
       throw new Error("Erreur de validation: L'entrée doit être une chaîne non vide");
     }
 
-    // Validation stricte du contexte
-    if (context) {
-      if (typeof context !== 'object' || Array.isArray(context)) {
-        throw new Error('Erreur de validation: Le contexte doit être un objet');
-      }
-
-      // Vérification complète des propriétés requises
-      if (!context.id || typeof context.id !== 'string') {
-        throw new Error('Erreur de validation: Le contexte doit avoir un id valide');
-      }
-
-      if (!Array.isArray(context.vectors)) {
-        context.vectors = [];
-      }
-
-      if (typeof context.timestamp !== 'number') {
-        throw new Error('Erreur de validation: Le contexte doit avoir un timestamp numérique');
-      }
-    } else {
-      const now = Date.now();
-      const createdAt = new Date();
-      const updatedAt = new Date();
-      
-      context = {
-        id: 'generated-' + now,
-        type: 'generated',
-        primaryShard: {
-          id: `shard-${now}`,
-          type: 'primary',
-          content: input,
-          timestamp: now,
-          complexityMetric: 0.75,
-          innovationPotential: 0.85,
-          metadata: {
-            createdAt,
-            updatedAt,
-            version: '1.0',
-          },
-          relatedClusters: [],
-          data: { source: 'business-strategy-agent' },
-          parentContextId: `ctx-${now}`,
-        },
-        data: {},
-        content: '',
-        vectors: [],
-        relatedClusters: [],
-        complexityMetric: 0.75,
-        innovationPotential: 0.85,
-        timestamp: now,
-        shards: [],
-        metadata: {
-          createdAt,
-          updatedAt,
-          version: '1.0.0',
-        },
-      };
-    }
-
     let requestType = this.analyzeRequestType(input);
     let content: string;
 
+    // Gestion du contexte manquant
+    const createContext = (): ContextShard => ({
+      id: 'generated-' + Date.now(),
+      type: 'generated',
+      data: {},
+      content: input,
+      relatedClusters: [],
+      timestamp: Date.now(),
+      complexityMetric: 0.75,
+      innovationPotential: 0.85,
+      parentContextId: 'auto-generated',
+      metadata: {
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        version: '1.0.0',
+      },
+    });
+
+    const finalContext = context || createContext();
+
     switch (requestType) {
-      case 'market-analysis':
-        content = await this.generateMarketAnalysis(input, context!);
+      case 'financial-analysis':
+        content = await this.performFinancialAnalysis(input);
         break;
-      case 'financial-projection':
-        content = await this.generateFinancialProjections(input, context!);
+      case 'business-strategy':
+        content = await this.developBusinessStrategy(input);
         break;
-      case 'strategic-planning':
-        content = await this.createStrategicPlan(input, context!);
+      case 'market-research':
+        content = await this.conductMarketResearch(input);
         break;
       case 'competition-analysis':
-        content = await this.analyzeCompetition(input, context!);
+        content = await this.analyzeCompetition(input);
         break;
       default:
-        content = `Analyse de votre demande:\n${input}\n\nL'Agent de Stratégie Business peut vous aider avec l'analyse de marché, les projections financières, la planification stratégique ou l'analyse de la concurrence.`;
+        content = `Analyse de votre demande:\n${input}\n\nL'Agent de Stratégie Business peut vous aider à réaliser des analyses financières, développer des stratégies d'entreprise ou mener des recherches de marché.`;
         requestType = 'generic';
     }
 
@@ -105,11 +60,11 @@ export class BusinessStrategyAgent implements Agent {
       content,
       metadata: {
         agentVersion: '1.0.0',
-        contextId: context?.id || 'no-context',
+        contextId: finalContext.id,
         timestamp: Date.now(),
         requestType,
-        complexity: context?.complexityMetric || 0.75,
-        innovationScore: context?.innovationPotential || 0.85,
+        complexity: finalContext.complexityMetric || 0.75,
+        innovationScore: finalContext.innovationPotential || 0.85,
       },
     };
   }
@@ -117,387 +72,152 @@ export class BusinessStrategyAgent implements Agent {
   private analyzeRequestType(input: string): string {
     const lowerInput = input
       .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[-]/g, '')
       .toLowerCase();
 
     // Détection des balises spéciales en premier
-    if (/^\[MARKET\]/i.test(input)) {
-      return 'market-analysis';
-    }
-
-    if (/^\[FINANCE\]/i.test(input)) {
-      return 'financial-projection';
+    if (/^\[FINANCIAL\]/i.test(input)) {
+      return 'financial-analysis';
     }
 
     if (/^\[STRATEGY\]/i.test(input)) {
       return 'strategic-planning';
     }
 
+    if (/^\[MARKET\]/i.test(input)) {
+      return 'market-analysis';
+    }
+
     if (/^\[COMPETITION\]/i.test(input)) {
       return 'competition-analysis';
     }
 
-    // Analyse sémantique - vérifier d'abord pour "analyse des concurrents"
-    if (/analyse.{1,5}(des)?.{1,5}concurrent|comp[ée]ti|rival|benchmark|avantage.{1,10}concurrentiel|concurrents sur|rivalité|qui sont.{1,10}concurrent|principaux concurrents/i.test(lowerInput)) {
-      return 'competition-analysis';
-    }
-    
-    if (/march[ée]|segment|tendance|analyse.{1,10}march[ée]|client|utilisateur|audience/i.test(lowerInput)) {
-      return 'market-analysis';
-    }
-
-    if (/financ|projection|revenu|budget|profit|investissement|cout|rentabilité/i.test(lowerInput)) {
+    // Analyse sémantique
+    if (/analyse|financiere|financial|evaluation|couts|benefices|profitabilite/i.test(lowerInput)) {
       return 'financial-projection';
     }
 
-    if (/strat[ée]g|plan|roadmap|vision|mission|objectif|long.{1,5}terme/i.test(lowerInput)) {
+    if (/strategie|business|developpement|croissance|expansion|planification/i.test(lowerInput)) {
       return 'strategic-planning';
+    }
+
+    if (/marche|research|etude|segment|tendances|taille/i.test(lowerInput)) {
+      return 'market-analysis';
+    }
+
+    if (/concurrence|concurrent|concurrentiel|competiteur|competition/i.test(lowerInput)) {
+      return 'competition-analysis';
+    }
+
+    // Ajout de la détection des tendances du marché
+    if (/tendances|trends|market trends|market trend analysis/i.test(lowerInput)) {
+      return 'market-trends';
+    }
+
+    if (/innovation|innovation assessment|innovation evaluation/i.test(lowerInput)) {
+      return 'innovation-assessment';
     }
 
     return 'generic';
   }
 
-  private async generateMarketAnalysis(input: string, context: ContextCluster): Promise<string> {
-    // Simuler l'analyse de marché
-    const marketSegments = [
-      {
-        name: 'Entreprises (B2B)',
-        size: '42 milliards €',
-        growth: '+7.5% par an',
-        trends: [
-          'Adoption croissante des solutions SaaS',
-          'Demande de sécurité renforcée',
-          'Intégration de l\'IA dans les processus métier',
-        ],
-        opportunities: 'Forte demande pour des solutions d\'automatisation et d\'IA agentique',
-      },
-      {
-        name: 'Consommateurs (B2C)',
-        size: '18 milliards €',
-        growth: '+12.3% par an',
-        trends: [
-          'Interfaces conversationnelles',
-          'Applications mobiles intelligentes',
-          'Personnalisation avancée',
-        ],
-        opportunities: 'Marché en expansion pour les assistants personnels augmentés',
-      },
-      {
-        name: 'Secteur public',
-        size: '15 milliards €',
-        growth: '+4.2% par an',
-        trends: [
-          'Modernisation des infrastructures',
-          'Initiatives de villes intelligentes',
-          'Services numériques aux citoyens',
-        ],
-        opportunities: 'Potentiel dans l\'automatisation des services publics',
-      },
-    ];
+  private async performFinancialAnalysis(input: string): Promise<string> {
+    // Simuler une analyse financière
+    const analysisResults = {
+      revenue: 1000000,
+      expenses: 750000,
+      profit: 250000,
+      roi: 0.33,
+    };
 
-    let analysis = `# Analyse de marché\n\n`;
-    analysis += `Analyse basée sur: "${input.substring(0, 50)}${input.length > 50 ? '...' : ''}"\n\n`;
-
-    analysis += `## Segments de marché clés\n\n`;
-    
-    marketSegments.forEach(segment => {
-      analysis += `### ${segment.name}\n`;
-      analysis += `- **Taille du marché:** ${segment.size}\n`;
-      analysis += `- **Croissance annuelle:** ${segment.growth}\n`;
-      analysis += `- **Tendances principales:**\n`;
-      
-      segment.trends.forEach(trend => {
-        analysis += `  - ${trend}\n`;
-      });
-      
-      analysis += `- **Opportunités:** ${segment.opportunities}\n\n`;
-    });
-    
-    analysis += `## Facteurs de marché importants\n\n`;
-    analysis += `1. **Dynamique concurrentielle:** Marché en consolidation avec émergence de nouveaux acteurs innovants\n`;
-    analysis += `2. **Barrières à l'entrée:** Modérées, principalement liées à l'expertise technique et à la propriété intellectuelle\n`;
-    analysis += `3. **Cycle de vie du produit:** Phase de croissance précoce pour les solutions d'IA agentique\n`;
-    analysis += `4. **Environnement réglementaire:** Évolution rapide avec focus sur la protection des données et l'éthique de l'IA\n\n`;
-
-    analysis += `## Recommandations stratégiques\n\n`;
-    analysis += `- Concentrer les efforts sur le segment B2B avec une approche verticale par industrie\n`;
-    analysis += `- Développer des cas d'usage démontrant clairement le ROI\n`;
-    analysis += `- Établir des partenariats stratégiques pour accélérer l'adoption\n`;
-    analysis += `- Investir dans la conformité réglementaire comme avantage concurrentiel\n`;
-
-    return analysis;
+    return `Résultats de l'analyse financière pour: "${input.substring(0, 50)}${input.length > 50 ? '...' : ''}"\n\n` +
+      `Revenu: ${analysisResults.revenue} EUR\n` +
+      `Dépenses: ${analysisResults.expenses} EUR\n` +
+      `Profit: ${analysisResults.profit} EUR\n` +
+      `ROI: ${(analysisResults.roi * 100).toFixed(2)}%\n\n` +
+      `Recommandations:\n- Réduire les coûts opérationnels\n- Augmenter les investissements dans les segments à forte croissance\n- Optimiser la structure de financement`;
   }
 
-  private async generateFinancialProjections(input: string, context: ContextCluster): Promise<string> {
-    // Simuler la génération de projections financières
-    const financialYears = [
-      {
-        year: 2025,
-        revenue: '2.4M €',
-        costs: '2.1M €',
-        profit: '0.3M €',
-        margin: '12.5%',
-        cashflow: '0.5M €',
-        investments: '1.2M €',
-      },
-      {
-        year: 2026,
-        revenue: '5.8M €',
-        costs: '4.2M €',
-        profit: '1.6M €',
-        margin: '27.6%',
-        cashflow: '1.9M €',
-        investments: '2.5M €',
-      },
-      {
-        year: 2027,
-        revenue: '12.5M €',
-        costs: '7.8M €',
-        profit: '4.7M €',
-        margin: '37.6%',
-        cashflow: '5.2M €',
-        investments: '3.8M €',
-      },
-    ];
+  private async developBusinessStrategy(input: string): Promise<string> {
+    // Simuler le développement d'une stratégie d'entreprise
+    const strategy = {
+      vision: "Devenir le leader du marché des solutions innovantes",
+      mission: "Fournir des produits de haute qualité qui répondent aux besoins des clients",
+      goals: [
+        "Augmenter la part de marché de 10% en 2 ans",
+        "Lancer 3 nouveaux produits par an",
+        "Améliorer la satisfaction client de 20%",
+      ],
+      tactics: [
+        "Investir dans la R&D",
+        "Renforcer les partenariats stratégiques",
+        "Optimiser les processus internes",
+      ],
+    };
 
-    const revenueStreams = [
-      { name: 'Licences Entreprise', percentage: '45%' },
-      { name: 'Services Professionnels', percentage: '30%' },
-      { name: 'Abonnements SaaS', percentage: '20%' },
-      { name: 'Autres', percentage: '5%' },
-    ];
-
-    let projection = `# Projections Financières\n\n`;
-    projection += `Projections basées sur: "${input.substring(0, 50)}${input.length > 50 ? '...' : ''}"\n\n`;
-
-    projection += `## Prévisions financières sur 3 ans\n\n`;
-    projection += `| Année | Revenus | Coûts | Profit | Marge | Flux de trésorerie | Investissements |\n`;
-    projection += `|-------|---------|-------|--------|-------|-------------------|----------------|\n`;
-    
-    financialYears.forEach(year => {
-      projection += `| ${year.year} | ${year.revenue} | ${year.costs} | ${year.profit} | ${year.margin} | ${year.cashflow} | ${year.investments} |\n`;
-    });
-    
-    projection += `\n## Sources de revenus\n\n`;
-    
-    revenueStreams.forEach(stream => {
-      projection += `- **${stream.name}:** ${stream.percentage}\n`;
-    });
-    
-    projection += `\n## Hypothèses clés\n\n`;
-    projection += `- Croissance annuelle du marché: 15%\n`;
-    projection += `- Taux d'acquisition client: 25% en année 1, 40% en année 2, 60% en année 3\n`;
-    projection += `- Taux de rétention client: 85% en année 1, 90% en années 2 et 3\n`;
-    projection += `- Dépenses marketing: 25% du revenu\n`;
-    projection += `- Coûts R&D: 30% du revenu\n\n`;
-
-    projection += `## Indicateurs financiers importants\n\n`;
-    projection += `- **Point d'équilibre:** Milieu de l'année 2025\n`;
-    projection += `- **ROI projeté:** 215% sur 3 ans\n`;
-    projection += `- **Valeur d'entreprise estimée (fin 2027):** 85-95M €\n`;
-    projection += `- **Besoin en financement:** 3.5M € pour atteindre les objectifs sur 3 ans\n`;
-
-    return projection;
+    return `Stratégie d'entreprise pour: "${input.substring(0, 50)}${input.length > 50 ? '...' : ''}"\n\n` +
+      `Vision: ${strategy.vision}\n` +
+      `Mission: ${strategy.mission}\n` +
+      `Objectifs:\n- ${strategy.goals.join('\n- ')}\n\n` +
+      `Tactiques:\n- ${strategy.tactics.join('\n- ')}\n\n` +
+      `Recommandations:\n- Suivre régulièrement les indicateurs de performance\n- Adapter la stratégie en fonction des évolutions du marché\n- Impliquer toutes les parties prenantes dans le processus de planification`;
   }
 
-  private async createStrategicPlan(input: string, context: ContextCluster): Promise<string> {
-    // Simuler la création d'un plan stratégique
-    const strategicPhases = [
-      {
-        phase: 'Phase 1: Établissement (6-12 mois)',
-        objectives: [
-          'Développer et valider la technologie d\'agents fondamentaux',
-          'Établir des partenariats stratégiques initiaux',
-          'Acquisition des premiers clients de référence',
-        ],
-        kpis: [
-          'MVP fonctionnel avec 3 agents spécialisés',
-          '5 clients pilotes actifs',
-          'Temps moyen d\'intégration < 2 semaines',
-        ],
-      },
-      {
-        phase: 'Phase 2: Expansion (12-24 mois)',
-        objectives: [
-          'Développer une offre produit complète',
-          'Établir une présence internationale',
-          'Construire un écosystème de partenaires',
-        ],
-        kpis: [
-          'Croissance MRR > 15% mensuel',
-          'NPS > 50',
-          'Équipe de 50+ personnes',
-        ],
-      },
-      {
-        phase: 'Phase 3: Domination (24-36 mois)',
-        objectives: [
-          'Position de leader sur le marché',
-          'Acquisition de technologies complémentaires',
-          'Préparation à une éventuelle introduction en bourse',
-        ],
-        kpis: [
-          'Part de marché > 20%',
-          'Marge brute > 75%',
-          'Taux de croissance annuel > 100%',
-        ],
-      },
-    ];
+  private async conductMarketResearch(input: string): Promise<string> {
+    // Simuler une recherche de marché
+    const marketData = {
+      marketSize: 5000000,
+      growthRate: 0.08,
+      topCompetitors: [
+        { name: "Competitor A", marketShare: 0.25 },
+        { name: "Competitor B", marketShare: 0.20 },
+        { name: "Competitor C", marketShare: 0.15 },
+      ],
+      keySegments: [
+        { name: "Segment 1", size: 2000000 },
+        { name: "Segment 2", size: 1500000 },
+        { name: "Segment 3", size: 1500000 },
+      ],
+    };
 
-    let plan = `# Plan Stratégique\n\n`;
-    plan += `Plan basé sur: "${input.substring(0, 50)}${input.length > 50 ? '...' : ''}"\n\n`;
-
-    plan += `## Vision\n\n`;
-    plan += `Devenir le leader mondial des plateformes d'agents IA, en révolutionnant la manière dont les entreprises interagissent avec la technologie et automatisent leurs processus métier critiques.\n\n`;
-    
-    plan += `## Mission\n\n`;
-    plan += `Développer une plateforme d'agents IA hautement adaptables et interopérables qui permettent aux entreprises d'augmenter significativement leur productivité, d'améliorer leurs prises de décisions, et de créer de nouvelles opportunités de croissance.\n\n`;
-    
-    plan += `## Objectifs stratégiques à 3 ans\n\n`;
-    plan += `1. Atteindre 15M€ de revenus récurrents annuels\n`;
-    plan += `2. Établir une présence dans 3 continents\n`;
-    plan += `3. Développer un écosystème de 100+ partenaires intégrateurs\n`;
-    plan += `4. Atteindre une valorisation de 100M€\n\n`;
-    
-    plan += `## Feuille de route stratégique\n\n`;
-    
-    strategicPhases.forEach(phase => {
-      plan += `### ${phase.phase}\n\n`;
-      plan += `**Objectifs:**\n`;
-      
-      phase.objectives.forEach(objective => {
-        plan += `- ${objective}\n`;
-      });
-      
-      plan += `\n**KPIs:**\n`;
-      
-      phase.kpis.forEach(kpi => {
-        plan += `- ${kpi}\n`;
-      });
-      
-      plan += `\n`;
-    });
-    
-    plan += `## Avantages concurrentiels\n\n`;
-    plan += `1. **Technologie propriétaire:** Moteur d'orchestration d'agents et résolution de conflits\n`;
-    plan += `2. **Expertise verticale:** Connaissance approfondie des secteurs finance, santé et industrie\n`;
-    plan += `3. **Écosystème d'innovation:** Programme de partenaires et marketplace d'agents\n`;
-    plan += `4. **Excellence opérationnelle:** Méthodologie éprouvée de déploiement et support\n\n`;
-
-    plan += `## Risques et mitigations\n\n`;
-    plan += `| Risque | Probabilité | Impact | Stratégie de mitigation |\n`;
-    plan += `|--------|-------------|--------|-------------------------|\n`;
-    plan += `| Évolution réglementaire | Élevée | Moyen | Conformité proactive et participation aux initiatives sectorielles |\n`;
-    plan += `| Concurrence des géants tech | Moyenne | Élevé | Différenciation par spécialisation et agilité |\n`;
-    plan += `| Difficultés de recrutement | Élevée | Élevé | Programme de formation interne et partenariats académiques |\n`;
-    plan += `| Adoption technologique lente | Moyenne | Élevé | Accompagnement client renforcé et méthodologie de change management |\n`;
-
-    return plan;
+    return `Résultats de la recherche de marché pour: "${input.substring(0, 50)}${input.length > 50 ? '...' : ''}"\n\n` +
+      `Taille du marché: ${marketData.marketSize} EUR\n` +
+      `Taux de croissance: ${(marketData.growthRate * 100).toFixed(2)}%\n` +
+      `Principaux concurrents:\n- ${marketData.topCompetitors.map(c => `${c.name} (Part de marché: ${(c.marketShare * 100).toFixed(2)}%)`).join('\n- ')}\n\n` +
+      `Segments clés:\n- ${marketData.keySegments.map(s => `${s.name} (Taille: ${s.size} EUR)`).join('\n- ')}\n\n` +
+      `Recommandations:\n- Cibler les segments à forte croissance\n- Surveiller les mouvements des principaux concurrents\n- Adapter les stratégies marketing en fonction des tendances du marché`;
   }
 
-  private async analyzeCompetition(input: string, context: ContextCluster): Promise<string> {
-    // Simuler l'analyse de la concurrence
-    const competitors = [
-      {
-        name: 'AgentForge',
-        type: 'Startup spécialisée',
-        fundingStage: 'Série B (45M$)',
-        strengths: [
-          'Technologie d\'agents avancée',
-          'Équipe technique solide',
-          'Croissance rapide (+200% sur 12 mois)',
-        ],
-        weaknesses: [
-          'Présence limitée en Europe',
-          'Manque d\'expertise sectorielle',
-          'Produit encore en maturation',
-        ],
-        marketShare: '12%',
-        threat: 'Élevée',
-      },
-      {
-        name: 'TechGiant AI',
-        type: 'Grande entreprise tech',
-        fundingStage: 'Cotée en bourse (Cap. 1.2T$)',
-        strengths: [
-          'Ressources financières importantes',
-          'Base clients massive',
-          'Infrastructure cloud robuste',
-        ],
-        weaknesses: [
-          'Offre généraliste, moins spécialisée',
-          'Innovation plus lente',
-          'Conflit potentiel avec d\'autres produits internes',
-        ],
-        marketShare: '35%',
-        threat: 'Moyenne',
-      },
-      {
-        name: 'AgileAgents',
-        type: 'Startup émergente',
-        fundingStage: 'Amorçage (3.5M$)',
-        strengths: [
-          'Approche très innovante',
-          'Agilité et rapidité d\'exécution',
-          'Expertise verticale en finance',
-        ],
-        weaknesses: [
-          'Manque d\'échelle',
-          'Ressources limitées',
-          'Produit encore jeune',
-        ],
-        marketShare: '5%',
-        threat: 'Faible à Moyenne (croissante)',
-      },
-    ];
-
-    let analysis = `# Analyse de la Concurrence\n\n`;
-    analysis += `Analyse basée sur: "${input.substring(0, 50)}${input.length > 50 ? '...' : ''}"\n\n`;
-
-    analysis += `## Paysage concurrentiel\n\n`;
-    analysis += `Le marché des plateformes d'agents IA est en pleine expansion avec trois catégories d'acteurs: les startups spécialisées, les grands acteurs technologiques qui étendent leurs offres, et les nouveaux entrants innovants. La fragmentation actuelle du marché laisse place à des opportunités de différenciation et de positionnement stratégique.\n\n`;
+  private async analyzeCompetition(input: string): Promise<string> {
+    // Simuler une analyse concurrentielle
+    const competitiveAnalysis = {
+      leadCompetitors: [
+        { name: "Alpha Inc", strengths: ["Expérience", "Réseau"], weaknesses: ["Prix élevés", "Innovation lente"] },
+        { name: "Beta Corp", strengths: ["Technologie avancée", "Innovation"], weaknesses: ["Faible part de marché", "Support client"] },
+        { name: "Gamma LLC", strengths: ["Prix compétitifs", "Distribution"], weaknesses: ["Qualité moyenne", "Peu diversifié"] }
+      ],
+      competitiveLandscape: "Marché en croissance avec trois acteurs principaux occupant 65% des parts de marché",
+      ourPosition: "Nouvel entrant avec une technologie disruptive mais faible notoriété"
+    };
     
-    analysis += `## Analyse des concurrents principaux\n\n`;
+    return `Analyse de la Concurrence pour: "${input.substring(0, 50)}${input.length > 50 ? '...' : ''}"
     
-    competitors.forEach(competitor => {
-      analysis += `### ${competitor.name}\n`;
-      analysis += `**Type:** ${competitor.type}\n`;
-      analysis += `**Financement:** ${competitor.fundingStage}\n`;
-      analysis += `**Forces:**\n`;
-      
-      competitor.strengths.forEach(strength => {
-        analysis += `- ${strength}\n`;
-      });
-      
-      analysis += `**Faiblesses:**\n`;
-      
-      competitor.weaknesses.forEach(weakness => {
-        analysis += `- ${weakness}\n`;
-      });
-      
-      analysis += `**Part de marché estimée:** ${competitor.marketShare}\n`;
-      analysis += `**Niveau de menace:** ${competitor.threat}\n\n`;
-    });
-    
-    analysis += `## Cartographie stratégique\n\n`;
-    analysis += `La concurrence se positionne principalement sur deux axes :\n`;
-    analysis += `1. **Axe Technologique:** De solutions génériques à spécialisées/verticales\n`;
-    analysis += `2. **Axe Métier:** De l'automatisation simple à l'intelligence décisionnelle\n\n`;
-    
-    analysis += `Notre position optimale se situe dans le quadrant supérieur droit: technologie spécialisée avec haute valeur ajoutée métier.\n\n`;
+## Paysage concurrentiel
+${competitiveAnalysis.competitiveLandscape}
 
-    analysis += `## Opportunités de différenciation\n\n`;
-    analysis += `1. **Spécialisation verticale:** Focus sur des secteurs sous-servis par les acteurs généralistes\n`;
-    analysis += `2. **Orchestration inter-agents:** Capacités avancées de coordination entre agents spécialisés\n`;
-    analysis += `3. **Intégration profonde:** Connecteurs natifs avec les systèmes métier existants\n`;
-    analysis += `4. **Conformité et gouvernance:** Fonctionnalités avancées adaptées aux industries régulées\n\n`;
+## Analyse des concurrents principaux
+${competitiveAnalysis.leadCompetitors.map(c => 
+  `### ${c.name}\n- **Forces**: ${c.strengths.join(', ')}\n- **Faiblesses**: ${c.weaknesses.join(', ')}`
+).join('\n\n')}
 
-    analysis += `## Stratégie recommandée face à la concurrence\n\n`;
-    analysis += `- Adopter une stratégie de "fast-follower" sur les innovations technologiques de base\n`;
-    analysis += `- Concentrer les efforts d'innovation sur les cas d'usage verticaux à haute valeur ajoutée\n`;
-    analysis += `- Établir des barrières à l'entrée via des partenariats stratégiques exclusifs\n`;
-    analysis += `- Développer un positionnement marketing distinctif axé sur la transformation métier plutôt que sur la technologie seule\n`;
+## Notre positionnement
+${competitiveAnalysis.ourPosition}
 
-    return analysis;
+## Stratégie recommandée face à la concurrence
+- Capitaliser sur notre avantage technologique
+- Se positionner sur des segments délaissés par les leaders
+- Développer notre notoriété par un marketing ciblé
+- Offrir un support client différenciant
+    `;
   }
 }
