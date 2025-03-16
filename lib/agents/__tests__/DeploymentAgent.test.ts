@@ -12,6 +12,7 @@ describe('DeploymentAgent', () => {
     expect(agent.id).toBe('deployment-agent');
     expect(agent.name).toBe('Agent de Déploiement');
     expect(agent.description).toBeDefined();
+    expect(agent.capabilities).toHaveLength(3);
     expect(agent.capabilities).toContain('deployment');
     expect(agent.capabilities).toContain('rollback');
   });

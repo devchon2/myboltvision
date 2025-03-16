@@ -276,8 +276,8 @@ it('devrait résoudre un conflit numérique en utilisant la stratégie de négoc
 
   expect(resolution).toBeDefined();
   expect(resolution.metadata.resolutionStrategy).toBe('negotiation');
-  expect(resolution.metadata.compromiseValue).toBe(40000000); // Moyenne des deux valeurs
-  expect(resolution.content).toContain('40000000');
+  expect(resolution.metadata.compromiseValue).toBe(40000000);
+  expect(resolution.content).toContain('40,000,000');
 });
 
   it('devrait résoudre un conflit de timeline en utilisant la stratégie de négociation', async () => {

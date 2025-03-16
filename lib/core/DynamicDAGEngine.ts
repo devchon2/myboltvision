@@ -10,6 +10,7 @@ import { standardizeAgent } from '../adapters/LegacyAgentAdapter.js';
  * représentés sous forme de graphes acycliques dirigés (DAG) de manière dynamique.
  */
 export class DynamicDAGEngine {
+  [x: string]: any;
   private agents = new Map<string, Agent>();
   private dags = new Map<string, DAG>();
   private executionCache = new Map<string, AgentResult>();
@@ -76,15 +77,17 @@ export class DynamicDAGEngine {
       });
     });
     
+    console.log("createDAGFromWorkflow workflow.id", workflow.id);
     const dag: DAG = {
-      id: `dag-${workflow.id}`,
+      id: `dag-${workflow.id || 'unknown'}`,
       name: workflow.name,
       description: workflow.description,
       nodes,
       edges,
       metadata: {}
     };
-    
+    console.log("createDAGFromWorkflow dag.id", dag.id);
+    console.log("createDAGFromWorkflow workflow", workflow);
     this.dags.set(dag.id, dag);
     
     return dag;
@@ -439,6 +442,13 @@ export class DynamicDAGEngine {
    */
   getDAG(dagId: string): DAG | undefined {
     return this.dags.get(dagId);
+  }
+
+  /**
+   * Vérifie si un agent est enregistré dans le moteur DAG
+   */
+  hasAgent(agentId: string): boolean {
+    return this.agents.has(agentId);
   }
 
   /**

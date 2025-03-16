@@ -1,0 +1,9 @@
+{
+  "entryPoints": ["lib"],
+  "entryPointStrategy": "expand",
+  "out": "docs/api",
+  "exclude": ["**/__tests__/**/*", "**/*.test.ts"],
+  "readme": "none",
+  "name": "MyBoltVision API Documentation",
+  "theme": "default"
+}

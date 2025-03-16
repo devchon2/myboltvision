@@ -1,6 +1,6 @@
 'use client';
-import { colors } from '../../app/design-system.ts';
-import styled from 'styled-components';
+import { colors } from '../../app/design-system.tsx';
+import {styled} from 'styled-components';
 import type { CSSProperties } from 'react';
 
 interface StyledProps {

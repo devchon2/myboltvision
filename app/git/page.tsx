@@ -6,10 +6,6 @@ import GitUrlImport from '../../components/git/GitUrlImport.client.tsx';
 import Header from '../../components/header/Header.tsx';
 import BackgroundRays from '../../components/ui/BackgroundRays.tsx';
 
-export const metadata: Metadata = {
-  title: 'Bolt',
-  description: 'Talk with Bolt, an AI assistant from StackBlitz',
-};
 
 export default function GitPage() {
   return (

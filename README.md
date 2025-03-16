@@ -3,11 +3,11 @@
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
-> Application entièrement autonome pour concevoir et développer tous types de projets à partir d'une simple idée.
+> Application d'intelligence artificielle avancée combinant traitement neuro-symbolique et raisonnement autonome pour une performance optimale sur des configurations grand public.
 
 ## 🚀 Présentation
 
-MyBoltVision est une plateforme d'intelligence artificielle qui orchestre des flux de travail agentiques pour accompagner l'utilisateur depuis l'idéation jusqu'au déploiement. En s'inspirant de Bolt.new et Cline, cette application transforme une idée brute en projet complet grâce à des agents spécialisés.
+MyBoltVision est une plateforme d'intelligence artificielle qui exploite une architecture modulaire pour combiner traitement neuro-symbolique et raisonnement autonome. L'objectif est d'atteindre une performance de pointe tout en respectant les contraintes matérielles spécifiées.
 
 ```
 💡 Idée → 📊 Analyse → 📝 Documentation → 🎨 Design → 💻 Développement → 🚀 Déploiement
@@ -15,21 +15,25 @@ MyBoltVision est une plateforme d'intelligence artificielle qui orchestre des fl
 
 ## ✨ Fonctionnalités principales
 
-- **Assistance à l'idéation** - Brainstorming, raffinement de concepts, évaluation d'idées
-- **Documentation complète** - Documents marketing, business plans, spécifications techniques
-- **Design et maquettage** - Wireframes, prototypes, visualisations
-- **Développement piloté par IA** - Génération de code, tests, documentation technique
-- **Optimisation pour modèles LLM légers** - Fonctionnement avec modèles locaux ou cloud
-- **Expérience utilisateur intuitive** - Interface conversationnelle et visuelle
+- **Traitement neuro-symbolique avancé** - Combinaison de réseaux neuronaux et de raisonnement symbolique pour une IA plus robuste et interprétable.
+- **Optimisation matérielle** - Exploitation des GPU RTX 4070 et des processeurs Ryzen pour une performance maximale.
+- **Sécurité renforcée** - Chiffrement des données et isolation des processus pour protéger la confidentialité des utilisateurs.
+- **Documentation complète** - Documents marketing, business plans, spécifications techniques, guides d'utilisation.
+- **Développement piloté par IA** - Génération de code, tests, documentation technique.
+- **Expérience utilisateur intuitive** - Interface conversationnelle et visuelle.
 
 ## 🛠️ Architecture
 
-MyBoltVision est construit sur une architecture modulaire qui sépare:
+MyBoltVision est construit sur une architecture modulaire qui comprend les modules suivants:
 
-- **Core** - Orchestrateur d'agents, gestionnaire de contexte, moteur de workflows
-- **Agents** - Modules spécialisés par domaine (idéation, conception, développement...)
-- **LLM** - Gestion des modèles de langage avec support multi-fournisseurs
-- **UI** - Interface utilisateur intuitive et workbenches spécialisés
+- **Vision** - Traitement d'images et de vidéos.
+- **NLP** - Traitement du langage naturel.
+- **Symbolic Reasoning** - Raisonnement symbolique et logique.
+- **Security** - Sécurité et confidentialité des données.
+- **Core** - Orchestrateur d'agents, gestionnaire de contexte, moteur de workflows.
+- **Agents** - Modules spécialisés par domaine (idéation, conception, développement...).
+- **LLM** - Gestion des modèles de langage avec support multi-fournisseurs.
+- **UI** - Interface utilisateur intuitive et workbenches spécialisés.
 
 Pour plus de détails, consultez [ARCHITECTURE.md](./ARCHITECTURE.md).
 
@@ -88,5 +92,4 @@ Ce projet est sous licence MIT - voir le fichier [LICENSE](./LICENSE) pour plus 
 
 ## 🙏 Remerciements
 
-- Inspiré par les projets [Bolt.new](https://bolt.new) et [Cline](https://github.com/celine-s/cline)
 - Développé avec ❤️ pour la communauté IA

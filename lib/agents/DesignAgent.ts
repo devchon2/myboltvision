@@ -1,6 +1,5 @@
-import type { ContextCluster } from '../../types/context';
-import { ContextManager } from '../core/ContextManager';
-import type { Agent, AgentResult } from '~/types/agent';
+import type { ContextCluster } from '../../types/context.d.ts';
+import type { Agent, AgentResult } from '~/types/agent.d.ts';
 
 export class DesignAgent implements Agent {
   id = 'design-agent';
@@ -8,10 +7,8 @@ export class DesignAgent implements Agent {
   description = 'Crée et optimise des designs UI/UX et des systèmes visuels';
   capabilities = ['ui-design', 'ux-analysis', 'design-system', 'visual-identity'];
 
-  private contextManager: ContextManager;
-
   constructor() {
-    this.contextManager = new ContextManager();
+    // Suppression de la propriété contextManager inutilisée
   }
 
   async execute(input: string, context?: ContextCluster): Promise<AgentResult> {
@@ -144,7 +141,7 @@ export class DesignAgent implements Agent {
     return 'generic';
   }
 
-  private async generateUIDesign(context: ContextCluster): Promise<string> {
+  private async generateUIDesign(_context: ContextCluster): Promise<string> {
     // Logique de génération d'interface utilisateur
     return (
       'Interface Utilisateur:\n' +
@@ -155,7 +152,7 @@ export class DesignAgent implements Agent {
     );
   }
 
-  private async analyzeUX(input: string, context: ContextCluster): Promise<string> {
+  private async analyzeUX(_input: string, context: ContextCluster): Promise<string> {
     // Logique d'analyse d'expérience utilisateur
     return (
       'Analyse UX:\n' +
@@ -166,7 +163,7 @@ export class DesignAgent implements Agent {
     );
   }
 
-  private async createDesignSystem(context: ContextCluster): Promise<string> {
+  private async createDesignSystem(_context: ContextCluster): Promise<string> {
     // Logique de création de système de design
     return (
       'Système de Design:\n' +
@@ -177,7 +174,7 @@ export class DesignAgent implements Agent {
     );
   }
 
-  private async developVisualIdentity(context: ContextCluster): Promise<string> {
+  private async developVisualIdentity(_context: ContextCluster): Promise<string> {
     // Logique de développement d'identité visuelle
     return (
       'Identité Visuelle:\n' +

@@ -48,7 +48,7 @@ describe('Header Component', () => {
     expect(accueilLink).toHaveAttribute('href', '/');
 
     const featuresLink = screen.getByText('Fonctionnalités');
-    expect(featuresLink).toHaveAttribute('href', '/features');
+    expect(featuresLink).toHaveAttribute('href', '/features/');
 
     const pricingLink = screen.getByText('Tarifs');
     expect(pricingLink).toHaveAttribute('href', '/pricing');

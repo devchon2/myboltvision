@@ -5,12 +5,16 @@ export class BusinessStrategyAgent implements Agent {
   id = 'business-strategy-agent';
   name = "Agent de Stratégie Business";
   description = "Analyse financière et stratégie d'entreprise";
-  capabilities = ['financial-analysis', 'business-strategy', 'market-research', 'competition-analysis'];
+  capabilities = ['financial-analysis', 'business-strategy', 'market-analysis', 'competition-analysis'];
 
   async execute(input: string, context?: ContextShard): Promise<AgentResult> {
     // Validation renforcée des entrées
-    if (typeof input !== 'string' || !input.trim()) {
-      throw new Error("Erreur de validation: L'entrée doit être une chaîne non vide");
+    if (!input || typeof input !== 'string' || !input.trim()) {
+      return Promise.reject(new Error("Erreur de validation: L'entrée doit être une chaîne non vide"));
+    }
+
+    if (context && (!context.id || typeof context.timestamp !== 'number')) {
+      return Promise.reject(new Error("Erreur de validation: Contexte invalide"));
     }
 
     let requestType = this.analyzeRequestType(input);
@@ -43,11 +47,21 @@ export class BusinessStrategyAgent implements Agent {
       case 'business-strategy':
         content = await this.developBusinessStrategy(input);
         break;
-      case 'market-research':
-        content = await this.conductMarketResearch(input);
+      case 'market-analysis':
+      case 'market-trends':
+        content = await this.conductMarketAnalysis(input);
         break;
       case 'competition-analysis':
         content = await this.analyzeCompetition(input);
+        break;
+      case 'brainstorming':
+        content = await this.generateBrainstorming(input);
+        break;
+      case 'innovation-assessment':
+        content = await this.assessInnovation(input);
+        break;
+      case 'concept-development':
+        content = await this.developConcept(input);
         break;
       default:
         content = `Analyse de votre demande:\n${input}\n\nL'Agent de Stratégie Business peut vous aider à réaliser des analyses financières, développer des stratégies d'entreprise ou mener des recherches de marché.`;
@@ -76,49 +90,121 @@ export class BusinessStrategyAgent implements Agent {
       .toLowerCase();
 
     // Détection des balises spéciales en premier
-    if (/^\[FINANCIAL\]/i.test(input)) {
-      return 'financial-analysis';
+    const tagPatterns = [
+      { pattern: /^\[FINANCIAL\]/i, type: 'financial-analysis' },
+      { pattern: /^\[FINANCE\]/i, type: 'financial-analysis' },
+      { pattern: /^\[STRATEGY\]/i, type: 'strategic-planning' },
+      { pattern: /^\[PLAN\]/i, type: 'strategic-planning' },
+      { pattern: /^\[MARKET\]/i, type: 'market-analysis' },
+      { pattern: /^\[COMPETITION\]/i, type: 'competition-analysis' },
+      { pattern: /^\[BRAINSTORM\]/i, type: 'brainstorming' },
+      { pattern: /^\[INNOVATION\]/i, type: 'innovation-assessment' },
+      { pattern: /^\[CONCEPT\]/i, type: 'concept-development' },
+      { pattern: /^\[TRENDS\]/i, type: 'market-trends' },
+      { pattern: /^\[PROJECTION\]/i, type: 'financial-projection' }
+    ];
+
+    for (const { pattern, type } of tagPatterns) {
+      if (pattern.test(input)) {
+        return type;
+      }
     }
 
-    if (/^\[STRATEGY\]/i.test(input)) {
-      return 'strategic-planning';
-    }
+    // Détection des types de requêtes spécifiques
+    const requestPatterns = [
+      {
+        patterns: [
+          /tendances|trends|market trends|market trend analysis/i,
+          /analyse des tendances du marché/i,
+          /Analyse du marché/i
+        ],
+        type: 'market-trends'
+      },
+      {
+        patterns: [
+          /brainstorming|brainstorm|nouvelle application|idée nouvelle|nouveau concept/i,
+          /\[BRAINSTORM\]/i
+        ],
+        type: 'brainstorming'
+      },
+      {
+        patterns: [
+          /évaluer (cette |une )?idée innovante/i,
+          /potentiel d'innovation/i,
+          /évaluer (une |la )?innovation/i,
+          /innovation assessment|innovation evaluation/i,
+          /analyse (de |d'|du )?potentiel innovant/i
+        ],
+        type: 'innovation-assessment'
+      },
+      {
+        patterns: [
+          /concept development|concept d'application|développer un concept|nouveau concept|idée d'application/i
+        ],
+        type: 'concept-development'
+      },
+      {
+        patterns: [
+          /concurrence|concurrent|concurrentiel|competiteur|competition/i
+        ],
+        type: 'competition-analysis'
+      },
+      {
+        patterns: [
+          /analyse|financiere|financial|evaluation|couts|benefices|profitabilite|projections financieres/i
+        ],
+        type: 'financial-analysis'
+      },
+      {
+        patterns: [
+          /strategie|business|developpement|croissance|expansion|planification/i
+        ],
+        type: 'strategic-planning'
+      },
+      {
+        patterns: [
+          /marche|research|etude|segment|taille|tendances du marche/i
+        ],
+        type: 'market-analysis'
+      }
+    ];
 
-    if (/^\[MARKET\]/i.test(input)) {
-      return 'market-analysis';
-    }
-
-    if (/^\[COMPETITION\]/i.test(input)) {
-      return 'competition-analysis';
-    }
-
-    // Analyse sémantique
-    if (/analyse|financiere|financial|evaluation|couts|benefices|profitabilite/i.test(lowerInput)) {
-      return 'financial-projection';
-    }
-
-    if (/strategie|business|developpement|croissance|expansion|planification/i.test(lowerInput)) {
-      return 'strategic-planning';
-    }
-
-    if (/marche|research|etude|segment|tendances|taille/i.test(lowerInput)) {
-      return 'market-analysis';
-    }
-
-    if (/concurrence|concurrent|concurrentiel|competiteur|competition/i.test(lowerInput)) {
-      return 'competition-analysis';
-    }
-
-    // Ajout de la détection des tendances du marché
-    if (/tendances|trends|market trends|market trend analysis/i.test(lowerInput)) {
-      return 'market-trends';
-    }
-
-    if (/innovation|innovation assessment|innovation evaluation/i.test(lowerInput)) {
-      return 'innovation-assessment';
+    for (const { patterns, type } of requestPatterns) {
+      if (patterns.some(pattern => pattern.test(lowerInput))) {
+        return type;
+      }
     }
 
     return 'generic';
+  }
+
+  private validateOutputSchema(output: AgentResult): boolean {
+    // Validate the output schema
+    const requiredFields = ['success', 'agentId', 'content', 'metadata'];
+    const metadataFields = ['agentVersion', 'contextId', 'timestamp', 'requestType', 'complexity', 'innovationScore'];
+
+    // Check required fields
+    const hasAllRequiredFields = requiredFields.every(field => field in output);
+    if (!hasAllRequiredFields) return false;
+
+    // Check metadata fields
+    const hasAllMetadataFields = metadataFields.every(field => field in output.metadata);
+    if (!hasAllMetadataFields) return false;
+
+    // Additional validation based on request type
+    switch (output.metadata.requestType) {
+      case 'market-analysis':
+      case 'market-trends':
+        return output.content.includes('Analyse de marché');
+      case 'brainstorming':
+        return output.content.includes('Brainstorming');
+      case 'innovation-assessment':
+        return output.content.includes('Innovation');
+      case 'concept-development':
+        return output.content.includes('Concept');
+      default:
+        return true;
+    }
   }
 
   private async performFinancialAnalysis(input: string): Promise<string> {
@@ -163,7 +249,7 @@ export class BusinessStrategyAgent implements Agent {
       `Recommandations:\n- Suivre régulièrement les indicateurs de performance\n- Adapter la stratégie en fonction des évolutions du marché\n- Impliquer toutes les parties prenantes dans le processus de planification`;
   }
 
-  private async conductMarketResearch(input: string): Promise<string> {
+  private async conductMarketAnalysis(input: string): Promise<string> {
     // Simuler une recherche de marché
     const marketData = {
       marketSize: 5000000,
@@ -199,15 +285,15 @@ export class BusinessStrategyAgent implements Agent {
       competitiveLandscape: "Marché en croissance avec trois acteurs principaux occupant 65% des parts de marché",
       ourPosition: "Nouvel entrant avec une technologie disruptive mais faible notoriété"
     };
-    
+
     return `Analyse de la Concurrence pour: "${input.substring(0, 50)}${input.length > 50 ? '...' : ''}"
-    
+    \n
 ## Paysage concurrentiel
 ${competitiveAnalysis.competitiveLandscape}
 
 ## Analyse des concurrents principaux
-${competitiveAnalysis.leadCompetitors.map(c => 
-  `### ${c.name}\n- **Forces**: ${c.strengths.join(', ')}\n- **Faiblesses**: ${c.weaknesses.join(', ')}`
+${competitiveAnalysis.leadCompetitors.map(c =>
+  `### ${c.name}\n- **Forces**: ${c.strengths.join(', ')}\n- **Faiblesses**: ${c.weaknesses.join(', ')}` 
 ).join('\n\n')}
 
 ## Notre positionnement
@@ -219,5 +305,63 @@ ${competitiveAnalysis.ourPosition}
 - Développer notre notoriété par un marketing ciblé
 - Offrir un support client différenciant
     `;
+  }
+
+  private async generateBrainstorming(input: string): Promise<string> {
+    const ideas = [
+      "Créer une plateforme de collaboration en temps réel",
+      "Développer une solution de gestion de projet basée sur l'IA",
+      "Intégrer des fonctionnalités de réalité augmentée",
+      "Proposer des outils d'analyse prédictive",
+      "Créer un écosystème de plugins extensibles"
+    ];
+
+    return `Session de brainstorming pour: "${input.substring(0, 50)}${input.length > 50 ? '...' : ''}"\n\n` +
+      `Idées générées:\n- ${ideas.join('\n- ')}\n\n` +
+      `Recommandations:\n- Prioriser les idées en fonction de leur impact potentiel\n- Évaluer la faisabilité technique\n- Identifier les partenariats stratégiques`;
+  }
+
+  private async assessInnovation(input: string): Promise<string> {
+    const assessment = {
+      innovationScore: 8.5,
+      strengths: ["Approche disruptive", "Potentiel de marché élevé", "Technologie de pointe"],
+      weaknesses: ["Risque technologique", "Dépendance aux partenaires", "Coûts de R&D élevés"],
+      recommendations: [
+        "Protéger la propriété intellectuelle",
+        "Développer un prototype fonctionnel",
+        "Identifier des partenaires stratégiques"
+      ]
+    };
+
+    return `Évaluation de l'innovation pour: "${input.substring(0, 50)}${input.length > 50 ? '...' : ''}"\n\n` +
+      `Score d'innovation: ${assessment.innovationScore}/10\n` +
+      `Forces:\n- ${assessment.strengths.join('\n- ')}\n\n` +
+      `Faiblesses:\n- ${assessment.weaknesses.join('\n- ')}\n\n` +
+      `Recommandations:\n- ${assessment.recommendations.join('\n- ')}`;
+  }
+
+  private async developConcept(input: string): Promise<string> {
+    const concept = {
+      name: "Nouveau concept d'application",
+      features: [
+        "Interface utilisateur intuitive",
+        "Intégration avec les principales plateformes",
+        "Analyse de données en temps réel",
+        "Personnalisation avancée",
+        "Sécurité renforcée"
+      ],
+      roadmap: [
+        "Phase 1: Définition du concept (1 mois)",
+        "Phase 2: Développement du MVP (3 mois)", 
+        "Phase 3: Tests utilisateurs (1 mois)",
+        "Phase 4: Lancement initial (1 mois)"
+      ]
+    };
+
+    return `Développement de concept pour: "${input.substring(0, 50)}${input.length > 50 ? '...' : ''}"\n\n` +
+      `Nom du concept: ${concept.name}\n` +
+      `Fonctionnalités clés:\n- ${concept.features.join('\n- ')}\n\n` +
+      `Feuille de route:\n- ${concept.roadmap.join('\n- ')}\n\n` +
+      `Recommandations:\n- Valider le concept avec des utilisateurs cibles\n- Prototyper les fonctionnalités principales\n- Établir un plan de financement`;
   }
 }

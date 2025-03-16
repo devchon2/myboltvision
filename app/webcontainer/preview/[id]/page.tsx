@@ -1,32 +1,17 @@
-import type { GetServerSidePropsContext } from 'next/types';
+'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 const PREVIEW_CHANNEL = 'preview-updates';
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const previewId = context.params?.id;
-
-  if (!previewId) {
-    return {
-      notFound: true,
-    };
-  }
-
-  return {
-    props: {
-      previewId,
-    },
-  };
-}
 
 export default function WebContainerPreview({ previewId }: { previewId: string }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const broadcastChannelRef = useRef<BroadcastChannel>();
+  const broadcastChannelRef = useRef<BroadcastChannel | null>(null);
   const [previewUrl, setPreviewUrl] = useState('');
 
   // Handle preview refresh
   const handleRefresh = useCallback(() => {
-    if (iframeRef.current && previewUrl) {
+    if(iframeRef.current && previewUrl) {
       // Force a clean reload
       iframeRef.current.src = '';
       requestAnimationFrame(() => {
@@ -35,7 +20,7 @@ export default function WebContainerPreview({ previewId }: { previewId: string }
         }
       });
     }
-  }, [previewUrl]);
+  }, [previewUrl] as const);
 
   // Notify other tabs that this preview is ready
   const notifyPreviewReady = useCallback(() => {

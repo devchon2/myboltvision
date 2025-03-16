@@ -1,6 +1,6 @@
-import type { ContextCluster } from '../../types/context';
-import { ContextManager } from '../core/ContextManager';
-import type { Agent, AgentResult } from '~/types/agent';
+import type { ContextCluster } from '../../types/context.js';
+import { ContextManager } from '../core/ContextManager.js';
+import type { Agent, AgentResult } from '../../types/agent.js';
 
 export class IdeationAgent implements Agent {
   id = 'ideation-agent';
@@ -8,7 +8,8 @@ export class IdeationAgent implements Agent {
   description = 'Génère et évalue des concepts innovants';
   capabilities = ['brainstorming', 'concept-development', 'innovation-assessment'];
 
-  private contextManager: ContextManager;
+  private contextManager: ContextManager
+  
 
   constructor() {
     this.contextManager = new ContextManager();
@@ -120,11 +121,11 @@ export class IdeationAgent implements Agent {
       return 'concept-development';
     }
 
-    if (/(evalu|score|analyse|idee|potentiel|validation|innovation)/i.test(lowerInput)) {
+    if (/(evalu|score|idee|potentiel|validation|innovation)/i.test(lowerInput)) {
       return 'innovation-assessment';
     }
 
-    if (/(tendances?|marche|trend|actuel(le)?s|industrie)/i.test(lowerInput)) {
+    if (/(tendances?|marche|trend|actuel(le)?s|industrie|analyse des tendances)/i.test(lowerInput)) {
       return 'market-trends';
     }
 

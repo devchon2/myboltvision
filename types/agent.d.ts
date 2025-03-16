@@ -53,7 +53,7 @@ export interface ConflictDescriptor {
   id: string;
   agentIds: string[];
   description: string;
-  severity: 'low' | 'medium' | 'high';
+  severity: string;
   timestamp: number;
 }
 
