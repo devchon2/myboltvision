@@ -1,9 +1,6 @@
+// app/components/chat/__mocks__/Artifact.tsx
 import React from 'react';
-import { vi } from 'vitest';
 
-// Mock simple du composant Artifact
-export const Artifact = vi.fn().mockImplementation(({ children }) => {
-  return <div data-testid="mocked-artifact">{children}</div>;
-});
-
-export default Artifact;
+export const Artifact = () => {
+  return <div data-testid="artifact-mock" />;
+};

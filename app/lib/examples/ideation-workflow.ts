@@ -6,7 +6,7 @@ import { IdeationAgent } from '../agents/IdeationAgent';
  * Exemple d'utilisation de l'agent d'idéation avec l'orchestrateur d'agents
  * pour créer un workflow complet de génération d'idées et de concepts.
  */
-export async function runIdeationWorkflow(initialInput: string): Promise<void> {
+export async function runIdeationWorkflow(initialInput: string) {
   console.log('Démarrage du workflow d\'idéation...');
   console.log(`Entrée initiale: "${initialInput}"`);
   console.log('-----------------------------------');
@@ -75,7 +75,7 @@ export async function runIdeationWorkflow(initialInput: string): Promise<void> {
     }
     
     console.log('\nWorkflow terminé avec succès!');
-    
+    return results;
   } catch (error) {
     console.error('Erreur lors de l\'exécution du workflow:', error);
   }
