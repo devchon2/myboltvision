@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { runIdeationWorkflow } from '../../lib/examples/ideation-workflow';
 import type { ContextShard } from '../../types/context';
 import { Markdown } from '../chat/Markdown';
+import { runMarketAnalysisWorkflow } from '../../lib/examples/market-analysis-workflow';
+import { runDocumentationWorkflow } from '../../lib/examples/documentation-workflow';
+import { runDesignWorkflow } from '../../lib/examples/design-workflow';
+import { runDevelopmentWorkflow } from '../../lib/examples/development-workflow';
+import { runDeploymentWorkflow } from '../../lib/examples/deployment-workflow';
 
 interface WorkbenchProps {
   initialIdea?: string;
@@ -73,6 +78,7 @@ export const IdeationWorkbench: React.FC<WorkbenchProps> = ({ initialIdea = '' }
   };
 
   const handleStartWorkflow = async () => {
+    console.log('handleStartWorkflow called');
     if (!idea.trim()) return;
     
     setIsProcessing(true);
@@ -83,15 +89,19 @@ export const IdeationWorkbench: React.FC<WorkbenchProps> = ({ initialIdea = '' }
       // Met à jour les résultats et marque l'étape comme complétée
       setResults(prev => ({ ...prev, ideation: workflowResults }));
       
-      setWorkflowSteps(steps => steps.map(step => 
-        step.id === 'ideation' 
-          ? { ...step, isCompleted: true } 
-          : step.id === 'market' 
-            ? { ...step, isActive: true }
-            : step
-      ));
+      setWorkflowSteps(steps => {
+        const newSteps = steps.map(step =>
+          step.id === 'ideation'
+            ? { ...step, isCompleted: true, isActive: false }
+            : step.id === 'market'
+              ? { ...step, isActive: true }
+              : step
+        );
+        console.log('newSteps', newSteps);
+        return newSteps;
+      });
       
-      setActiveView('results');
+      setActiveView('market');
     } catch (error) {
       console.error('Erreur lors de l\'exécution du workflow:', error);
     } finally {
@@ -107,7 +117,145 @@ export const IdeationWorkbench: React.FC<WorkbenchProps> = ({ initialIdea = '' }
     setActiveView(stepId);
   };
 
+  const handleMarketAnalysis = async () => {
+    console.log('handleMarketAnalysis called');
+    const concept = results.ideation;
+    if (!concept) return;
+
+    setIsProcessing(true);
+    try {
+      const marketAnalysisResults = await runMarketAnalysisWorkflow(concept);
+      setResults(prev => ({ ...prev, market: marketAnalysisResults }));
+      setWorkflowSteps(steps => {
+        const newSteps = steps.map(step =>
+          step.id === 'market'
+            ? { ...step, isCompleted: true, isActive: false }
+            : step.id === 'documentation'
+              ? { ...step, isActive: true }
+              : step
+        );
+        console.log('newSteps', newSteps);
+        return newSteps;
+      });
+      setActiveView('documentation');
+    } catch (error) {
+      console.error('Erreur lors de l\'exécution de l\'analyse de marché:', error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleDocumentation = async () => {
+    console.log('handleDocumentation called');
+    const concept = results.market;
+    if (!concept) return;
+
+    setIsProcessing(true);
+    try {
+      const documentationResults = await runDocumentationWorkflow(concept);
+      setResults(prev => ({ ...prev, documentation: documentationResults }));
+      setWorkflowSteps(steps => {
+        const newSteps = steps.map(step =>
+          step.id === 'documentation'
+            ? { ...step, isCompleted: true, isActive: false }
+            : step.id === 'design'
+              ? { ...step, isActive: true }
+              : step
+        );
+        console.log('newSteps', newSteps);
+        return newSteps;
+      });
+      setActiveView('design');
+    } catch (error) {
+      console.error('Erreur lors de l\'exécution de la génération de documentation:', error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleDesign = async () => {
+    console.log('handleDesign called');
+    const concept = results.documentation;
+    if (!concept) return;
+
+    setIsProcessing(true);
+    try {
+      const designResults = await runDesignWorkflow(concept);
+      setResults(prev => ({ ...prev, design: designResults }));
+      setWorkflowSteps(steps => {
+        const newSteps = steps.map(step =>
+          step.id === 'design'
+            ? { ...step, isCompleted: true, isActive: false }
+            : step.id === 'development'
+              ? { ...step, isActive: true }
+              : step
+        );
+        console.log('newSteps', newSteps);
+        return newSteps;
+      });
+      setActiveView('development');
+    } catch (error) {
+      console.error('Erreur lors de l\'exécution de la génération de design:', error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleDevelopment = async () => {
+    console.log('handleDevelopment called');
+    const concept = results.design;
+    if (!concept) return;
+
+    setIsProcessing(true);
+    try {
+      const developmentResults = await runDevelopmentWorkflow(concept);
+      setResults(prev => ({ ...prev, development: developmentResults }));
+      setWorkflowSteps(steps => {
+        const newSteps = steps.map(step =>
+          step.id === 'development'
+            ? { ...step, isCompleted: true, isActive: false }
+            : step.id === 'deployment'
+              ? { ...step, isActive: true }
+              : step
+        );
+        console.log('newSteps', newSteps);
+        return newSteps;
+      });
+      setActiveView('deployment');
+    } catch (error) {
+      console.error('Erreur lors de l\'exécution de la génération de code:', error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleDeployment = async () => {
+    console.log('handleDeployment called');
+    const concept = results.development;
+    if (!concept) return;
+
+    setIsProcessing(true);
+    try {
+      const deploymentResults = await runDeploymentWorkflow(concept);
+      setResults(prev => ({ ...prev, deployment: deploymentResults }));
+      setWorkflowSteps(steps => {
+        const newSteps = steps.map(step =>
+          step.id === 'deployment'
+            ? { ...step, isCompleted: true, isActive: false }
+            : step
+        );
+        console.log('newSteps', newSteps);
+        return newSteps;
+      });
+    } catch (error) {
+      console.error('Erreur lors de l\'exécution de la préparation au déploiement:', error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const renderStepContent = (stepId: string) => {
+    console.log('renderStepContent called with stepId:', stepId);
     switch (stepId) {
       case 'ideation':
         return (
@@ -150,7 +298,7 @@ export const IdeationWorkbench: React.FC<WorkbenchProps> = ({ initialIdea = '' }
             <p>Cette section vous permettra d'analyser le marché, la concurrence et les opportunités pour votre projet.</p>
             <button 
               className="action-button"
-              onClick={() => console.log('Lancement de l\'analyse de marché')}
+              onClick={handleMarketAnalysis}
             >
               Lancer l'analyse de marché
             </button>
@@ -173,7 +321,7 @@ export const IdeationWorkbench: React.FC<WorkbenchProps> = ({ initialIdea = '' }
                 <input type="checkbox" value="technical" /> Documentation technique
               </label>
             </div>
-            <button className="action-button">
+            <button className="action-button" onClick={handleDocumentation}>
               Générer les documents
             </button>
           </div>
@@ -185,7 +333,7 @@ export const IdeationWorkbench: React.FC<WorkbenchProps> = ({ initialIdea = '' }
             <h2>Espace de design</h2>
             <p>Créez des wireframes, maquettes et prototypes pour votre projet.</p>
             <div className="design-actions">
-              <button className="action-button">Générer wireframes</button>
+              <button className="action-button" onClick={handleDesign}>Générer wireframes</button>
               <button className="action-button">Créer maquette haute-fidélité</button>
               <button className="action-button">Prototype interactif</button>
             </div>
@@ -210,7 +358,7 @@ export const IdeationWorkbench: React.FC<WorkbenchProps> = ({ initialIdea = '' }
                 <option value="python">Python</option>
               </select>
             </div>
-            <button className="action-button">
+            <button className="action-button" onClick={handleDevelopment}>
               Générer l'architecture
             </button>
           </div>
@@ -231,7 +379,7 @@ export const IdeationWorkbench: React.FC<WorkbenchProps> = ({ initialIdea = '' }
                 <option value="azure">Azure</option>
               </select>
             </div>
-            <button className="action-button">
+            <button className="action-button" onClick={handleDeployment}>
               Préparer le déploiement
             </button>
           </div>
@@ -266,9 +414,7 @@ export const IdeationWorkbench: React.FC<WorkbenchProps> = ({ initialIdea = '' }
       </div>
       
       <div className="workbench-content">
-        {activeView === 'results' 
-          ? renderStepContent('results')
-          : renderStepContent(workflowSteps.find(s => s.id === activeView)?.id || 'ideation')}
+        {renderStepContent(workflowSteps.find(s => s.isActive)?.id || 'ideation')}
       </div>
       
       <style>{`

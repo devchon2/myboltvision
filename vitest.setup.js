@@ -10,7 +10,7 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
 }));
 
 // Mock complet de import.meta
-global.import = {
+const importMetaMock = {
   meta: {
     env: {
       SSR: false,
@@ -33,11 +33,14 @@ global.import = {
         webcontainer: undefined,
         webcontainerContext: {
           loaded: false,
-        }
+        },
+        shellHighlighter: Promise.resolve({ codeToHtml: () => '' }),
       }
     }
   }
 };
+
+vi.stubGlobal('import', importMetaMock);
 
 // Mock de webcontainer
 vi.mock('app/lib/webcontainer', () => ({
@@ -46,6 +49,7 @@ vi.mock('app/lib/webcontainer', () => ({
     on: vi.fn(),
     fs: {
       writeFile: vi.fn().mockResolvedValue(undefined),
+      watch: vi.fn(),
     },
     internal: {
       watchPaths: vi.fn(),
