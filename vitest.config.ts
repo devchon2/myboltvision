@@ -1,16 +1,15 @@
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import { vitePlugin as remix } from '@remix-run/dev';
+import react from '@vitejs/plugin-react';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
-  plugins: [remix()],
+  plugins: [!process.env.VITEST ? remix() : react(), tsconfigPaths()],
   test: {
     globals: true,
-    environment: 'node',
+    environment: 'jsdom',
     include: ['**/*.{test,spec}.{js,ts,jsx,tsx}'],
-    environmentMatchGlobs: [
-      ['**/*.{test,spec}.{jsx,tsx}', 'jsdom']
-    ],
     setupFiles: ['./vitest.setup.js'],
     deps: {
       // Définit quels modules seront autorisés à utiliser des imports ESM
@@ -20,13 +19,7 @@ export default defineConfig({
     sequence: {
       hooks: 'list'
     },
-    // Configuration explicite pour les modules ESM problématiques
-    server: {
-      deps: {
-        external: [/@remix-run\/server-runtime/],
-        interopDefault: true
-      }
-    }
+    unstubGlobals: true,
   },
   resolve: {
     alias: {

@@ -71,7 +71,6 @@ export const Markdown = memo(({ children, content, html = false, limitedMarkdown
   return (
     <ReactMarkdown
       allowedElements={allowedHTMLElements}
-      className={styles.MarkdownContent}
       components={components}
       remarkPlugins={remarkPlugins(limitedMarkdown)}
       rehypePlugins={rehypePlugins(html)}
